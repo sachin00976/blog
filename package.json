@@ -2,9 +2,11 @@
   "name": "blog",
   "version": "1.0.0",
   "description": "first project by siachin",
-  "main": "index.js",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start":"node server.js",
+    "dev": "nodemon server.js"
   },
   "author": "sachin patel",
   "license": "ISC",
@@ -19,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
     "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.9",
     "validator": "^13.12.0"
   }
 }
