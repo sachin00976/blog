@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { router as userRouter } from './src/routes/user.routes.js';
+import {router as blogRouter} from './src/routes/blog.routes.js'
 //import { dirname } from 'path';
 //import { fileURLToPath } from 'url'; // Import this for `fileURLToPath`
 import path from 'path'; // Import the `path` module
@@ -32,5 +33,5 @@ app.use(fileUpload({
 }))
 // Register routes
 app.use('/api/v1/user', userRouter);
-
+app.use('/api/v1/blog',blogRouter);
 export default app;

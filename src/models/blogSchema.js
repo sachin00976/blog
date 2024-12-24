@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 const blogSchema=mongoose.Schema({
     title:{
@@ -84,7 +84,11 @@ const blogSchema=mongoose.Schema({
         type: Boolean,
         default: false,
       },
+      published:{
+        type:Boolean,
+        default:false,
+      }
 
 },{timestamps:true})
-
+blogSchema.plugin(aggregatePaginate)
 export const Blog=mongoose.model("Blog",blogSchema)

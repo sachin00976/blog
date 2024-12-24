@@ -53,7 +53,7 @@ const blogPost = asyncHandler(async (req, res) => {
     paraTwoImage ? uploadOnCloudinary(paraTwoImage.tempFilePath) : Promise.resolve(null),
     paraThreeImage ? uploadOnCloudinary(paraThreeImage.tempFilePath) : Promise.resolve(null),
   ];
-
+  const [mainImageRes,paraOneRes,paraTwoRes,paraThreeRes]=await Promise.all(uploadPromise)
   if(
     !mainImageRes || mainImage.error
     || (paraOneImage && (!paraOneRes ))
@@ -112,5 +112,34 @@ const blogPost = asyncHandler(async (req, res) => {
     new ApiResponse(201, blog, "Blog Uploaded Successfully!")
   );
 });
+const deleteBlog=asyncHandler(async (req,res)=>{
 
-export { blogPost };
+  const {id}=req.params 
+  if(!id)
+  {
+    throw new ApiError(404,"Inavlid Request To Delete A Blog Without ID")
+  }
+
+  const blog=await Blog.findById(id)
+
+  if(!blog)
+  {
+    throw new ApiError(404,"Blog Not Found!")
+  }
+
+  const delRes=await blog.deleteOne()
+
+  return res.status(200).json(
+    new ApiResponse(200,delRes,"blog deleted successfully")
+  )
+})
+const getAllBlogs=asyncHandler(async (req, res)=>
+{
+  const aggregate = Blog.aggregate();
+}
+)
+export { 
+  blogPost,
+  deleteBlog,
+
+ };
