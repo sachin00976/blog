@@ -135,11 +135,88 @@ const deleteBlog=asyncHandler(async (req,res)=>{
 })
 const getAllBlogs=asyncHandler(async (req, res)=>
 {
-  const aggregate = Blog.aggregate();
+  const blogs = await Blog.aggregate(
+    [
+      {
+        $match:{
+          "published":true
+        }
+      },
+      {
+        $project:{
+          published:0,
+          createdAt:0,
+          updatedAt:0,
+          __v:0,
+
+        }
+      }
+    ]
+  );
+  
+  if(!blogs)
+  {
+    throw new ApiError(500,"Blogs Fteched Unsuccessful!")
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200,blogs,"Blogs fetched successfully")
+  )
 }
 )
+
+const getSingleBlog=asyncHandler(async (req,res)=>{
+
+    const {id}=req.params
+
+    if(!id)
+    {
+      throw new ApiError(404,"ID is invalid")
+    }
+
+    const blog=await Blog.findById(id).select("-published -__v -updatedAt -createdAt")
+
+    if(!blog)
+    {
+      throw new ApiError(400,"Blog not found!")
+    }
+    return res.status(200).json(
+      new ApiResponse(200,blog,"Blog fetched successfully!")
+    )
+
+}) 
+const updateBlog=asyncHandler(async (req,res)=>{
+  const {id}=req.params
+  if(!id)
+  {
+    throw new ApiError(404,"Invalid id")
+  }
+
+  let blog=await Blog.findById(id)
+
+  const newBlogData = {
+    title: req.body.title,
+    intro: req.body.intro,
+    category: req.body.category,
+    paraOneTitle: req.body.paraOneTitle,
+    paraOneDescription: req.body.paraOneDescription,
+    paraTwoTitle: req.body.paraTwoTitle,
+    paraTwoDescription: req.body.paraTwoDescription,
+    paraThreeTitle: req.body.paraThreeTitle,
+    paraThreeDescription: req.body.paraThreeDescription,
+    published: req.body.published,
+  };
+
+  if(req.files)
+  {
+    const {mainImage,paraOneImage,paraTwoImage,paraThreeImage}=req.files
+    
+  }
+})
 export { 
   blogPost,
   deleteBlog,
+  getAllBlogs,
+  getSingleBlog
 
  };
