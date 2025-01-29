@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 
 const ErrorComp = ({data = {}} ) => {
-    const { message = "An error occurred", statusCode = 500 } = data;
+    const { message = "An error occurred", statusCode = 400 } = data;
   
     return (
       <>

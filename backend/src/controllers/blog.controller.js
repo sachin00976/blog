@@ -13,8 +13,7 @@ const blogPost = asyncHandler(async (req, res) => {
   const paraOneImage  =req.files['paraOneImage[]'];
   const  paraTwoImage  = req.files['paraTwoImage[]'];
   const  paraThreeImage  = req.files['paraThreeImage[]'];
-  console.log("amin",req.files['mainImage[]'])
-  console.log("amin",mainImage)
+  
  
   if (!mainImage) {
     throw new ApiError(404, "Blog Main Image Is Required");
@@ -199,6 +198,7 @@ const updateBlog=asyncHandler(async (req,res)=>{
   }
 
   let blog=await Blog.findById(id)
+  //console.log("req:",req.files)
 
   const newBlogData = {
     title: req.body.title,
@@ -215,12 +215,15 @@ const updateBlog=asyncHandler(async (req,res)=>{
 
   if(req.files)
   {
-    const {mainImage,paraOneImage,paraTwoImage,paraThreeImage}=req.files
+    const mainImage= req.files['mainImage[]'];
+  const paraOneImage  =req.files['paraOneImage[]'];
+  const  paraTwoImage  = req.files['paraTwoImage[]'];
+  const  paraThreeImage  = req.files['paraThreeImage[]'];
 
-    if(!mainImage)
-    {
-      throw new ApiError(404,"mainimage file is required!")
-    }
+    // if(!mainImage)
+    // {
+    //   throw new ApiError(404,"mainimage file is required!")
+    // }
 
     const allowedFormat=["image/png","image/jpeg","image/webp"]
     if(
@@ -236,7 +239,10 @@ const updateBlog=asyncHandler(async (req,res)=>{
 
   if(req.files )
   {
-    const {mainImage,paraOneImage,paraTwoImage,paraThreeImage}=req.files
+    const mainImage= req.files['mainImage[]'];
+  const paraOneImage  =req.files['paraOneImage[]'];
+  const  paraTwoImage  = req.files['paraTwoImage[]'];
+  const  paraThreeImage  = req.files['paraThreeImage[]'];
     if(mainImage)
     {
        const mainImageId=blog.mainImage.public_id

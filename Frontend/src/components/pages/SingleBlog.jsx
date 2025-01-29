@@ -3,8 +3,14 @@ import useApiHandler from '../../utility/ApiHandler'
 import ErrorComp from '../../utility/ErrorPage'
 import Loader from '../../utility/Loader'
 import { useParams } from 'react-router-dom'
+import { Context } from '../../AppWrapper'
+import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {UpdateBlog} from './index.js'
 function SingleBlog() {
   const {id}=useParams()
+  const {user}=useContext(Context);
+  const navigate=useNavigate();
   const {res,data,error,loader}=useApiHandler(
     {
       url:`/api/v1/blog/singleBlog/${id}`
@@ -32,6 +38,16 @@ function SingleBlog() {
     <div className="text-5xl font-bold text-white uppercase tracking-wider rounded-3xl text-center bg-opacity-75 bg-[#38235d] py-4 px-6">
       {data.category}
     </div>
+    {user && data && user._id===data.createdBy ?(
+         <div className="mt-10 text-center">
+         <button
+           onClick={() => navigate(`/blog/update/${data._id}`)}
+           className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+         >
+           Edit
+         </button>
+       </div>
+    ):null}
 
     {/* Title */}
     <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-white text-center rounded-2xl pb-4">
