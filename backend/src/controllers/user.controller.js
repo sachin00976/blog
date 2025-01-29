@@ -219,7 +219,7 @@ const getAllUserBlog=asyncHandler(async(req,res)=>{
         [
             {
               $match: {
-                email: `${user.email}` // Closing brace added here
+                _id: new ObjectId(user._id) // Closing brace added here
               }
             },
             {
@@ -255,6 +255,108 @@ const getAllUserBlog=asyncHandler(async(req,res)=>{
         new ApiResponse(200,allBlogs,"All users blogs fetched successfully")
     )
 })
+const getUserProfile=asyncHandler(async(req,res)=>{
+  const userId=req.user._id;
+  const {id}=req.params;
+  const otherUserId=id;
+  
+  if(!ObjectId.isValid(userId) || !ObjectId.isValid(otherUserId) )
+  {
+      throw new ApiError(404,"Inavalid Id")
+  }
+  const otherUserInfo= await User.findById(otherUserId).select("-password -refreshToken")
+  if(!otherUserInfo)
+  {
+    throw new ApiError(500,"Something went wrong while fectching user info")
+  }
+  const SubResponse=await Subscriber.aggregate(
+    [
+      {
+        $match:{
+          authorId: new ObjectId(otherUserId)
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          subscriberIds:{
+            $addToSet:"$subscriberId"
+          }
+        }
+      },
+      {
+        $project: {
+          _id:0,
+          suscribed:{
+            $in:[ new ObjectId(userId), "$subscriberIds"]
+          },
+          SubscriberCount:{
+            $size:"$subscriberIds"
+          }
+        }
+      }
+      
+    ]
+  )
+  if(!SubResponse)
+  {
+      throw new ApiError(500,"Something went wrong while fetching subscriber")
+  }
+  let subscribed=false
+ let subscriberCount=0
+ if(SubResponse.length>0)
+ {
+   subscribed=SubResponse[0]?.subscribed
+   subscriberCount=SubResponse[0]?.SubscriberCount
+
+ }
+ const allBlogs=await User.aggregate(
+  [
+      {
+        $match: {
+          _id: new ObjectId(otherUserId) // Closing brace added here
+        }
+      },
+      {
+        $lookup: {
+          from: "blogs",
+          localField: "_id",
+          foreignField: "createdBy",
+          as: "blogs"
+        }
+      },
+      {
+        $project: {
+          blogs: {
+            $map: {
+              input: "$blogs",
+              as: "blog",
+              in: {
+                _id: "$$blog._id",
+                mainImage: "$$blog.mainImage",
+                category: "$$blog.category",
+                title: "$$blog.title",
+                authorAvatar: "$$blog.authorAvatar",
+                authorName: "$$blog.authorName"
+              }
+            }
+          }
+        }
+      }
+    ]
+    
+)
+  if(!allBlogs)
+  {
+    throw new ApiError(500,"something went wrong while fetching user blog")
+  }
+  const userInfo={subscriberCount:subscriberCount,subscribed:subscribed,...otherUserInfo._doc,blogs:allBlogs}
+  
+  
+  return res.status(200).json(
+  new ApiResponse(200,userInfo,"Successfully fetched user data")
+  )
+})
 export {
     register,
     login,
@@ -262,6 +364,7 @@ export {
     getMyProfile,
     getAllAuthors,
     getAllUserBlog,
+    getUserProfile
 
 
 };
