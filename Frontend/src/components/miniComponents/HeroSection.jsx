@@ -26,14 +26,7 @@ function HeroSection() {
       </>
     );
   }
-  if(res!==null && res.success===false)
-  {
-    return (
-      <>
-        <ErrorComp data={res} />
-      </>
-    )
-  }
+  
 
   // Make sure `data` is an array before mapping over it
   return (

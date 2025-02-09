@@ -2,8 +2,9 @@ import React from 'react';
 import useApiHandler from '../../utility/ApiHandler';
 import ErrorComp from '../../utility/ErrorPage';
 import Loader from '../../utility/Loader';
-
+import { useNavigate } from 'react-router-dom';
 function AllAuthors() {
+  const navigate=useNavigate();
   const { res, data, error, loader } = useApiHandler({
     url: '/api/v1/user/authors',
     method: 'get',
@@ -26,6 +27,7 @@ function AllAuthors() {
         {data && data.length !== 0 ? (
           data.map((author) => (
             <div
+              onClick={()=>navigate(`/blog/userProfile/${author._id}`)}
               key={author._id}
               className="border-4 border-white p-6 rounded-lg flex flex-col items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:border-purple-300"
             >
