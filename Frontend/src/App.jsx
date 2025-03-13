@@ -7,6 +7,8 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Context } from './AppWrapper'
 import { useContext } from 'react'
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID; 
 function App() {
   const navigate=useNavigate()
   const {setUser,setIsAuthenticated,setBlogs}=useContext(Context)
@@ -18,11 +20,13 @@ function App() {
     
   },[navigate])
   return (
-    <>  
+    <> 
+    <GoogleOAuthProvider clientId={clientId}> 
     <Navbar/>
     <Outlet />
     <Footer/>
     <Toaster/>
+    </GoogleOAuthProvider>
     </>
   )
 }

@@ -9,8 +9,7 @@ const userSchema = mongoose.Schema(
         name: {
             type: String,
             required: true,
-            minLength: [3, "Name must contain at least 3 characters"],
-            maxLength: [32, "Name can contain only up to 32 characters"],
+            
         },
         email: {
             type: String,
@@ -22,11 +21,16 @@ const userSchema = mongoose.Schema(
         },
         phone: {
             type: String,
-            required: true,
+            required: false,
             validate: {
-                validator: (value) => validator.isMobilePhone(value, "any"),
+                validator: (value) => 
+                    {
+                        if(!value || value === "Unspecified") return true;
+                        return validator.isMobilePhone(value, "any")
+                    },
                 message: "Please provide a valid phone number",
             },
+            default:"Unspecified"
         },
         avatar: {
             public_id: { type: String, 
@@ -38,21 +42,23 @@ const userSchema = mongoose.Schema(
         },
         education: {
             type: String,
-            required: true,
+            required: false,
+            default:"Unspecified"
         },
         role: {
             type: String,
-            required: true,
+            required: false, 
             enum: {
                 values: ["Reader", "Author"],
                 message: "Role must be either 'Reader' or 'Author'",
             },
+            default: "Author"
         },
         password: {
             type: String,
             required: true,
             minLength: [8, "Password must contain at least 8 characters"],
-            maxLength: [32, "Password cannot exceed 32 characters"],
+            maxLength: [50, "Password cannot exceed 50 characters"],
         },
         refreshToken: {
             type: String,

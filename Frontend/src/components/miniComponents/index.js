@@ -6,6 +6,8 @@ import MyBlogs from "./MyBlogs";
 import MyProfile from "./MyProfile";
 import PopularAuthor from "./PopularAuthor";
 import TrendingBlogs from "./TrendingBlogs";
+import GoogleLoginComponent from "./GoogleLogin";
+import GoogleRegisterComponent from "./GoogleRegister";
 
 export {
     Chart,
@@ -15,5 +17,7 @@ export {
     MyBlogs,
     MyProfile,
     PopularAuthor,
-    TrendingBlogs
+    TrendingBlogs,
+    GoogleLoginComponent,
+    GoogleRegisterComponent
 }

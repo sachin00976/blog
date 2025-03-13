@@ -31,20 +31,18 @@ const createSubscriber=asyncHandler(async (req,res)=>{
 const deleteSubscriber = asyncHandler(async (req, res) => {
     const subscriberId = req.user.id; // ID of the logged-in user
     const { id } = req.params; // ID of the author
-
+    
     
     if (!ObjectId.isValid(subscriberId) || !ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid subscriberId or authorId");
     }
-    // console.log(typeof subscriberId);
-    // console.log(typeof id);
-    // Create the filter
+  
     const filter = {
         subscriberId: ObjectId.createFromHexString(subscriberId),
         authorId: ObjectId.createFromHexString(id)
     };
 
-    // Perform the delete operation
+    
     const response = await Subscriber.deleteOne(filter);
 
     if (response.deletedCount > 0) {

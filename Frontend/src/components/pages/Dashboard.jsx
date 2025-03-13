@@ -67,7 +67,8 @@ function Dashboard() {
             </div>
             <div className="flex items-center">
               <span className="text-purple-300 font-medium">Followers:</span>
-              <p className="ml-2">{user.subscriberCount }</p>
+              <p className="ml-2">{`${user.subscriberCount ? user.subscriberCount : 0}`}</p>
+
             </div>
           </div>
         </div>

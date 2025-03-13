@@ -5,7 +5,7 @@ import { User } from "../models/userSchema.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Subscriber } from "../models/subscriberSchema.js";
 import { ObjectId } from "mongodb";
-
+import { jwtDecode } from "jwt-decode";
 const genrateAccessTokenAndRefreshToken=async(userid)=>{
     try {
         const user=await User.findById(userid)
@@ -44,7 +44,7 @@ const register = asyncHandler(async (req, res) => {
 
     const { name, email, password, phone, role, education } = req.body;
 
-    console.log(name, email, password, phone, role, education);
+    //console.log(name, email, password, phone, role, education);
 
     // Validate required fields
     if (!name || !email || !password || !phone || !role || !education) {
@@ -98,7 +98,7 @@ const login = asyncHandler(async (req, res) => {
     const { email, password, role } = req.body;
   
     // Log input for debugging (remove this in production)
-    console.log(`Email: ${email}, Password: ${password}, Role: ${role}`);
+    //console.log(`Email: ${email}, Password: ${password}, Role: ${role}`);
   
     // Validate input fields
     if (!email || !password || !role) {
@@ -129,7 +129,7 @@ const login = asyncHandler(async (req, res) => {
   
     // Extract subscriber count or default to 0
     const subscriberCount = response.length === 0 ? "0" : response[0]?.SubscriberCount || "0";
-    console.log(`Subscriber Count: ${subscriberCount}`);
+    //console.log(`Subscriber Count: ${subscriberCount}`);
   
     // Prepare user object with subscription count
     const userWithSubscriptionCount = { subscriberCount, ...user._doc };
@@ -287,7 +287,7 @@ const getUserProfile=asyncHandler(async(req,res)=>{
       {
         $project: {
           _id:0,
-          suscribed:{
+          subscribed:{
             $in:[ new ObjectId(userId), "$subscriberIds"]
           },
           SubscriberCount:{
@@ -310,6 +310,7 @@ const getUserProfile=asyncHandler(async(req,res)=>{
    subscriberCount=SubResponse[0]?.SubscriberCount
 
  }
+//  console.log("SUbRESPONSE:",SubResponse)
  const allBlogs=await User.aggregate(
   [
       {
@@ -352,11 +353,110 @@ const getUserProfile=asyncHandler(async(req,res)=>{
   }
   const userInfo={subscriberCount:subscriberCount,subscribed:subscribed,...otherUserInfo._doc,blogs:allBlogs}
   
-  
+  console.log("userInfo:",userInfo)
   return res.status(200).json(
   new ApiResponse(200,userInfo,"Successfully fetched user data")
   )
 })
+const googleRegister=asyncHandler(async (req,res)=>{
+  console.log("called");
+    const {credential}=req.body
+    const credentialResponse=await jwtDecode(credential);
+    // console.log("Response")
+    console.log(credentialResponse)
+    const email=credentialResponse.email;
+    const password=credentialResponse.sub;
+    const name=credentialResponse.given_name;
+    const avatar=credentialResponse.picture || req.files['avatar[]']
+    // console.log(req.files)
+    const allowedFormat=["image/png","image/jpeg","image/webp"]
+   
+    const user = await User.findOne({ email });
+    if (user) {
+        throw new ApiError(404, "User with given email already exists");
+    }
+    const uploadRespone= await uploadOnCloudinary(avatar)
+    if(!uploadRespone)
+    {
+        throw new ApiError(404,"Avatar File Is Missing!")
+    }
+    //console.log(uploadRespone)
+    const response=await User.create({
+      name,
+      email,
+      password,
+      avatar:{
+          public_id:uploadRespone.public_id,
+          url:uploadRespone.secure_url,
+      }
+  });
+ 
+
+  // Fetch the created user
+  const createduser = await User.findOne({ email });
+  if (!createduser) {
+      throw new ApiError(500, "Internal DB server error! Please try again");
+  }
+
+  // Return successful response
+  console.log("user create success");
+  const {refreshToken,accessToken}=await genrateAccessTokenAndRefreshToken(createduser._id)
+
+  return res.status(201)
+  .cookie("accessToken",accessToken,options)
+  .cookie("refreshToken",refreshToken,options)
+  .json(
+      new ApiResponse(201, createduser, "User registered successfully")
+  );
+})
+const googleLogin=asyncHandler(async (req,res)=>{
+  const {credential}=req.body;
+  //console.log("called00")
+  if(!credential)
+  {
+    throw new ApiError(404,"Invalid Credential || Please Try Again")
+  }
+  const credentialResponse= await jwtDecode(credential);
+  const email=credentialResponse.email
+  const password=credentialResponse.sub;
+  if(!email || !password)
+  {
+    throw new ApiError(404,"Login unsccessful | please try again")
+  }
+  
+  const user = await User.findOne({ email }).select("-createdAt -updatedAt");
+  if(!user)
+  {
+    throw new ApiError(400,"Invalid Login || PLease Register First")
+  }
+  const isPasswordValid = await user.isPasswordCorrect(password);
+    if (!isPasswordValid) {
+      throw new ApiError(404, "Invalid credential. Please try again.");
+    }
+  const userId=user._id;
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(404, "Invalid userId");
+  }
+  const response = await Subscriber.aggregate([
+    { $match: { authorId: new ObjectId(userId) } },
+    { $count: "SubscriberCount" },
+  ]);
+  if (!response) {
+    throw new ApiError(500, "Something went wrong while fetching subscriber count");
+  }
+  const subscriberCount = response.length === 0 ? "0" : response[0]?.SubscriberCount || "0";
+  const userWithSubscriptionCount = { subscriberCount, ...user._doc };
+
+  const { refreshToken, accessToken } = await genrateAccessTokenAndRefreshToken(user._id);
+  
+    // Set cookies and respond with success
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(new ApiResponse(201, userWithSubscriptionCount, "User logged in successfully"));
+  });
+
 export {
     register,
     login,
@@ -364,7 +464,9 @@ export {
     getMyProfile,
     getAllAuthors,
     getAllUserBlog,
-    getUserProfile
+    getUserProfile,
+    googleRegister,
+    googleLogin
 
 
 };

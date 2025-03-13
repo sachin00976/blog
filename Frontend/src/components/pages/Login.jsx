@@ -6,6 +6,7 @@ import { Context } from '../../AppWrapper';
 import Button from '../../utility/Button';
 import Input from '../../utility/Input';
 import { Link } from 'react-router-dom';
+import {GoogleLoginComponent} from '../miniComponents/index.js'
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -110,7 +111,10 @@ function Login() {
             Sign in
           </Button>
         </form>
-
+         {/* google Login */}
+           <div className="mt-4 text-center">
+            <GoogleLoginComponent/>
+            </div>
         {/* Registration Link */}
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
