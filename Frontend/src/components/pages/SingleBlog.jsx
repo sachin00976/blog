@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom'
 import { Context } from '../../AppWrapper'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Comments from '../miniComponents/comments'
 
 function SingleBlog() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ function SingleBlog() {
     <>
       <article>
         {data && (
-          <section className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 mx-auto px-6 md:px-12 lg:px-20 py-12 space-y-12 rounded-xl shadow-lg">
+          <section className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 mx-auto px-6 md:px-12 lg:px-20 py-12 space-y-12 shadow-lg">
             {/* Category */}
             <div className="text-5xl font-bold text-white uppercase tracking-wider rounded-3xl text-center bg-opacity-75 bg-[#38235d] py-4 px-6">
               {data.category}
@@ -132,6 +133,9 @@ function SingleBlog() {
           </section>
         )}
       </article>
+      <div className="fixed">
+        <Comments />
+      </div>
     </>
   );
 }
