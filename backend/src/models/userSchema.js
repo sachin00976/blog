@@ -76,7 +76,7 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.isPasswordCorrect = async function (inputPassword) 
 {
-    console.log(this.password)
+    //console.log(this.password)
     if (!inputPassword) {
         throw new Error("Password input is missing");
     }

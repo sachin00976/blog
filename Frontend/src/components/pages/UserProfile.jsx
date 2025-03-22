@@ -74,7 +74,7 @@ function UserProfile() {
             </div>
 
             <div className="text-lg space-y-4">
-              <h2 className="text-2xl font-bold mb-4">{user.name}</h2>
+              <h2 className="text-2xl font-bold mb-4">{data.name}</h2>
               <div className="space-y-2">
                 <div className="flex items-center">
                   <span className="text-purple-300 font-medium">Role:</span>

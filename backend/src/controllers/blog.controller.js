@@ -117,7 +117,7 @@ const blogPost = asyncHandler(async (req, res) => {
   );
 });
 const deleteBlog=asyncHandler(async (req,res)=>{
-
+  // console.log("delete bolg called")
   const {id}=req.params 
   if(!id)
   {
