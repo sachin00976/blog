@@ -6,11 +6,33 @@ import { useParams } from 'react-router-dom'
 import { Context } from '../../AppWrapper'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import toast from 'react-hot-toast'
+import axios from 'axios'
 function SingleBlog() {
   const { id } = useParams();
   const { user } = useContext(Context);
   const navigate = useNavigate();
+  const deleteBlogHandler=async ()=>{
+
+   try {
+     const config={
+      method:"delete",
+       url:`/api/v1/blog/deletePost/${id}`,
+      data:'' 
+     }
+     const response= await axios(config);
+     if(response)
+     {
+       toast.success("Blog deleted successfully");
+       navigate('/')
+     }
+   } catch (error) {
+      console.log("error occur while deleting the blog:",error.message);
+      toast.error(error?.response?.data?.message || "FAILED TO DELETE | PLEASE TRY AGAIN");
+
+   }
+    
+  }
   const { res, data, error, loader } = useApiHandler({
     url: `/api/v1/blog/singleBlog/${id}`,
   });
@@ -28,17 +50,25 @@ function SingleBlog() {
               {data.category}
             </div>
 
-            {/* Edit Button */}
-            {user && user._id === data.createdBy && (
-              <div className="mt-10 text-center">
-                <button
-                  onClick={() => navigate(`/blog/update/${data._id}`)}
-                  className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
-                >
-                  Edit
-                </button>
-              </div>
-            )}
+            {/* Edit & Delete Buttons */}
+{user && user._id === data.createdBy && (
+  <div className="mt-10 text-center flex justify-center gap-4">
+    <button
+      onClick={() => navigate(`/blog/update/${data._id}`)}
+      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+    >
+      Edit
+    </button>
+    <button
+      onClick={deleteBlogHandler}
+      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+    >
+      Delete
+    </button>
+  </div>
+)}
+
+
 
             {/* Title */}
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-white text-center rounded-2xl pb-4">
