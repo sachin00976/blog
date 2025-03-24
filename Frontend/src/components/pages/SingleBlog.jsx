@@ -10,30 +10,33 @@ import toast from 'react-hot-toast'
 import axios from 'axios';
 import Comments from '../miniComponents/comments'
 
+
 function SingleBlog() {
   const { id } = useParams();
   const { user } = useContext(Context);
   const navigate = useNavigate();
-  const deleteBlogHandler=async ()=>{
+  if (!user) {
+    navigate('/login')
+  }
+  const deleteBlogHandler = async () => {
 
-   try {
-     const config={
-      method:"delete",
-       url:`/api/v1/blog/deletePost/${id}`,
-      data:'' 
-     }
-     const response= await axios(config);
-     if(response)
-     {
-       toast.success("Blog deleted successfully");
-       navigate('/')
-     }
-   } catch (error) {
-      console.log("error occur while deleting the blog:",error.message);
+    try {
+      const config = {
+        method: "delete",
+        url: `/api/v1/blog/deletePost/${id}`,
+        data: ''
+      }
+      const response = await axios(config);
+      if (response) {
+        toast.success("Blog deleted successfully");
+        navigate('/')
+      }
+    } catch (error) {
+      console.log("error occur while deleting the blog:", error.message);
       toast.error(error?.response?.data?.message || "FAILED TO DELETE | PLEASE TRY AGAIN");
 
-   }
-    
+    }
+
   }
   const { res, data, error, loader } = useApiHandler({
     url: `/api/v1/blog/singleBlog/${id}`,
@@ -53,22 +56,22 @@ function SingleBlog() {
             </div>
 
             {/* Edit & Delete Buttons */}
-{user && user._id === data.createdBy && (
-  <div className="mt-10 text-center flex justify-center gap-4">
-    <button
-      onClick={() => navigate(`/blog/update/${data._id}`)}
-      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
-    >
-      Edit
-    </button>
-    <button
-      onClick={deleteBlogHandler}
-      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
-    >
-      Delete
-    </button>
-  </div>
-)}
+            {user && user._id === data.createdBy && (
+              <div className="mt-10 text-center flex justify-center gap-4">
+                <button
+                  onClick={() => navigate(`/blog/update/${data._id}`)}
+                  className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={deleteBlogHandler}
+                  className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
 
 
 
@@ -164,9 +167,11 @@ function SingleBlog() {
           </section>
         )}
       </article>
-      <div className="fixed">
-        <Comments />
-      </div>
+      {user && (
+        <div className="fixed">
+          <Comments />
+        </div>
+      )}
     </>
   );
 }

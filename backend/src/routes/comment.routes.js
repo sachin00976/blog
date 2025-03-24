@@ -5,5 +5,5 @@ const router=express.Router()
 router.route("/newComment/:blogId").post(verifyJWT,createComment)
 router.route("/getComment/:blogId").post(verifyJWT,getAllBlogComments)
 router.route("/editComment/:commentId/:blogId").post(verifyJWT,editComment)
-router.route("/deleteComment/:commentId/:blogId").post(verifyJWT,deleteCommentY)
+router.route("/deleteComment/:commentId/:blogId").post(verifyJWT,deleteComment)
 export {router}
