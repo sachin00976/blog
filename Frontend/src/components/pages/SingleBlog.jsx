@@ -7,31 +7,36 @@ import { Context } from '../../AppWrapper'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import axios from 'axios'
+import axios from 'axios';
+import Comments from '../miniComponents/comments'
+
+
 function SingleBlog() {
   const { id } = useParams();
   const { user } = useContext(Context);
   const navigate = useNavigate();
-  const deleteBlogHandler=async ()=>{
+  if (!user) {
+    navigate('/login')
+  }
+  const deleteBlogHandler = async () => {
 
-   try {
-     const config={
-      method:"delete",
-       url:`/api/v1/blog/deletePost/${id}`,
-      data:'' 
-     }
-     const response= await axios(config);
-     if(response)
-     {
-       toast.success("Blog deleted successfully");
-       navigate('/')
-     }
-   } catch (error) {
-      console.log("error occur while deleting the blog:",error.message);
+    try {
+      const config = {
+        method: "delete",
+        url: `/api/v1/blog/deletePost/${id}`,
+        data: ''
+      }
+      const response = await axios(config);
+      if (response) {
+        toast.success("Blog deleted successfully");
+        navigate('/')
+      }
+    } catch (error) {
+      console.log("error occur while deleting the blog:", error.message);
       toast.error(error?.response?.data?.message || "FAILED TO DELETE | PLEASE TRY AGAIN");
 
-   }
-    
+    }
+
   }
   const { res, data, error, loader } = useApiHandler({
     url: `/api/v1/blog/singleBlog/${id}`,
@@ -44,29 +49,29 @@ function SingleBlog() {
     <>
       <article>
         {data && (
-          <section className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 mx-auto px-6 md:px-12 lg:px-20 py-12 space-y-12 rounded-xl shadow-lg">
+          <section className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 mx-auto px-6 md:px-12 lg:px-20 py-12 space-y-12 shadow-lg">
             {/* Category */}
             <div className="text-5xl font-bold text-white uppercase tracking-wider rounded-3xl text-center bg-opacity-75 bg-[#38235d] py-4 px-6">
               {data.category}
             </div>
 
             {/* Edit & Delete Buttons */}
-{user && user._id === data.createdBy && (
-  <div className="mt-10 text-center flex justify-center gap-4">
-    <button
-      onClick={() => navigate(`/blog/update/${data._id}`)}
-      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
-    >
-      Edit
-    </button>
-    <button
-      onClick={deleteBlogHandler}
-      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
-    >
-      Delete
-    </button>
-  </div>
-)}
+            {user && user._id === data.createdBy && (
+              <div className="mt-10 text-center flex justify-center gap-4">
+                <button
+                  onClick={() => navigate(`/blog/update/${data._id}`)}
+                  className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={deleteBlogHandler}
+                  className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
 
 
 
@@ -162,6 +167,11 @@ function SingleBlog() {
           </section>
         )}
       </article>
+      {user && (
+        <div className="fixed">
+          <Comments />
+        </div>
+      )}
     </>
   );
 }
