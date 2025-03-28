@@ -139,24 +139,23 @@ const deleteBlog=asyncHandler(async (req,res)=>{
 })
 const getAllBlogs=asyncHandler(async (req, res)=>
 {
-  const blogs = await Blog.aggregate(
-    [
-      {
-        $match:{
-          "published":true
-        }
-      },
-      {
-        $project:{
-          published:0,
-          createdAt:0,
-          updatedAt:0,
-          __v:0,
+ 
+  const {tag}=req.query;
+  let blogs;
+  if(!tag)
+  {
+    blogs=await Blog.find({
+      "published":true
+    }).select("-published -createdAt -updatedAt -__v")
+  }
+  else
+  {
+    blogs=await Blog.find({
+      "published":true,
+      "category":tag
 
-        }
-      }
-    ]
-  );
+    })
+  }
   
   if(!blogs)
   {
