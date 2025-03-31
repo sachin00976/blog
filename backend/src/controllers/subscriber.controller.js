@@ -53,9 +53,76 @@ const deleteSubscriber = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Subscriber not found or already deleted");
     }
 });
+const getAllUserSubscriberInfo=asyncHandler(async(req,res)=>{
+    const userId=req.user.id;
+    if(!ObjectId.isValid(userId))
+    {
+        throw new ApiError(400, "Invalid Use Id");
+    }
+    const response=await Subscriber.aggregate(
+        [
+            {
+              "$match": {
+                "subscriberId": new ObjectId(userId) 
+              }
+            },
+            {
+              "$lookup": {
+                "from": "users",
+                "localField": "authorId",
+                "foreignField": "_id",
+                "as": "authorInfo"
+              }
+            },
+            {
+              "$addFields": {
+                "authorInfo": { "$arrayElemAt": ["$authorInfo", 0] }
+              }
+            },
+            {
+              "$addFields": {
+                "name": "$authorInfo.name",
+                "email": "$authorInfo.email",
+                "avatar": "$authorInfo.avatar",
+              }
+            },{
+                  $lookup:{
+                    "from":"subscribers",
+                    "localField":"authorId",
+                    "foreignField":"authorId",
+                    "as":"subscriberCount"
+                  }
+            }, 
+            {
+              $addFields: {
+                "subscriberCount": {$size:"$subscriberCount"}
+              }
+            },
+            {
+              "$project": {
+                "_id": 1,
+                "authorId": 1,
+                "name": 1,
+                "email": 1,
+                "avatar": 1,
+                "subscriberCount":1
+              }
+            }
+          ])
+          if(!response)
+          {
+            throw new ApiError(500,"Error Occur While Fetching User's Subscribed Auhtor Info")
+          }
+          return res.status(200).json(
+            new ApiResponse(200,response,"all User's Subscribed Auhtor Info Fectched Successfully")
+          
+          
+    )
 
+})
 export  {
     createSubscriber,
     deleteSubscriber,
+    getAllUserSubscriberInfo
     
 }

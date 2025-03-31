@@ -21,7 +21,7 @@ const Comments = () => {
     if (!user) {
         navigate('/login')
     } else {
-        console.log("user: ", user)
+        //console.log("user: ", user)
     }
     useEffect(() => {
         const fetchData = async () => {
@@ -115,7 +115,7 @@ const Comments = () => {
     return (
         <>
             {isCollapsed && (
-                <div className="fixed top-16 right-2 inline p-2 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center border border-gray-300">
+                <div className="fixed z-20 top-16 right-2  p-2 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center border border-gray-300">
                     <button onClick={toggleSidebar} className="relative flex items-center">
                         <FiMessageSquare className="w-6 h-6 text-gray-600" />
                         {comments.length > 0 && (

@@ -205,13 +205,28 @@ const getMyProfile=asyncHandler(async(req,res)=>{
     new ApiResponse(200,userWithSubscriptionCount,"Successfully fetched user data")
     )
 })
-const getAllAuthors=asyncHandler(async (req,res)=>{
-    const authors=await User.find({role:"Author"})
+const getAllAuthors = asyncHandler(async (req, res) => {
+  let { skip = 0, limit = 9 } = req.query;
 
-    return res.status(200).json(
-        new ApiResponse(200,authors,"All authors fetched successfully")
-    )
-})
+  console.log("Received query params:", req.query);
+
+  // Ensure values are properly converted to numbers with defaults
+  skip = Number(skip) || 0;
+  limit = Number(limit) || 9;
+
+  console.log("Processed values -> Skip:", skip, "Limit:", limit);
+
+  const authors = await User.find({ role: "Author" }).skip(skip).limit(limit);
+
+  if (authors.length === 0) {
+      throw new ApiError(404, "No authors found");
+  }
+
+  return res.status(200).json(
+      new ApiResponse(200, authors, "All authors fetched successfully")
+  );
+});
+
 const getAllUserBlog=asyncHandler(async(req,res)=>{
     const user=req.user
    
