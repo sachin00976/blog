@@ -59,12 +59,13 @@ const getAllUserSubscriberInfo = asyncHandler(async (req, res) => {
 
   page = Number(page) || 0;
   limit = Number(limit) || 9;
-  let skip = (page > 0 ? (page - 1) * limit : 0);
+  let skip = (page > 0 ? (page) * limit : 0);
 
   if (!ObjectId.isValid(userId)) {
     throw new ApiError(400, "Invalid User Id");
   }
-  // console.log("page:",page)
+  console.log("page:",page)
+  console.log("skip:",skip)
 
   const totalCountResponse = await Subscriber.aggregate([
     {
@@ -151,7 +152,56 @@ const getAllUserSubscriberInfo = asyncHandler(async (req, res) => {
     new ApiResponse(200, response, "All user's subscribed author info fetched successfully")
   );
 });
+const getUserSubscribedAuthorBlogs=asyncHandler(async(req,res)=>{
+  const userId=req.body.id;
+  const allBlogArrResponse=await Subscriber.aggregate([
+    {
+      $match: {
+        "subscriberId":ObjectId('67dabeb56c505b24db229327')
+  
+      }
+    },
+    {
+      $lookup: {
+        from: "blogs",
+        localField:"authorId",
+        foreignField: "createdBy",
+        as: "blogsArr"
+      }
+    },
+    {
+      $addFields: {
+        blogsArr: {
+         $sortArray:{
+           input:"$blogsArr",
+            sortBy:{createdAt:-1}
+         }
+        }
+      }
+    },
+    {
+      $addFields: {
+        blogsArr:{
+          $slice:["$blogsArr",5]
+        }
+      }
+    },
+    {
+      $project: {
+        "blogsArr":1
+      }
+    }
+  ])
 
+  if(!allBlogArrResponse)
+  {
+    throw new ApiError(500,"Error Occured While Fetching All Subscribed Author Blogs")
+  }
+  return res.status(200).json(
+    new ApiResponse(200,allBlogArrResponse,"Latest Blog Of Subscribed Author Fetched Sucessfully")
+  )
+
+})
 
 export  {
     createSubscriber,
