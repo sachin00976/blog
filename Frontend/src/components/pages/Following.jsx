@@ -11,16 +11,16 @@ function Followings() {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [pageNo, setPageNo] = useState(1);
+  const [pageNo, setPageNo] = useState(0);
   const [limit, setLimit] = useState(4);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchData = async (page = pageNo, lim = limit) => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/v1/subscribe/allSubscribedAuhtorInfo/${page}?limit=${lim}`);
-      setData(response.data.data);
-      setTotalPages(Math.ceil(response.data.total / lim));
+      const response = await axios.get(`/api/v1/subscribe/allSubscribedAuhtorInfo?page=${page}&limit=${limit}`);
+      setData(response.data.data.allAuthorInfo);
+      setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,7 +36,7 @@ function Followings() {
   if (loading) return <Loader />;
 
   const handlePageChange = (page) => {
-    if (page > 0 && page <= totalPages) {
+    if (page >= 0 && page < totalPages) {
       setPageNo(page);
       fetchData(page, limit);
     }
@@ -46,7 +46,7 @@ function Followings() {
     <div className="min-h-screen bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
       <h1 className="text-4xl font-bold text-center text-white mb-8">Your Followings</h1>
       {/* Limit Selector */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-end mb-4">
         <label className="text-white mr-2">Items per page:</label>
         <select
           value={limit}
@@ -89,7 +89,7 @@ function Followings() {
       <div className="flex justify-center mt-6 space-x-2">
         <button
           onClick={() => handlePageChange(pageNo - 1)}
-          disabled={pageNo === 1}
+          disabled={pageNo === 0}
           className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
         >
           Prev
@@ -97,15 +97,15 @@ function Followings() {
         {[...Array(totalPages)].map((_, i) => (
           <button
             key={i}
-            onClick={() => handlePageChange(i + 1)}
-            className={`px-4 py-2 ${pageNo === i + 1 ? 'bg-purple-500 text-white' : 'bg-gray-300'} rounded`}
+            onClick={() => handlePageChange(i)}
+            className={`px-4 py-2 ${pageNo === i ? 'bg-purple-500 text-white' : 'bg-gray-300'} rounded`}
           >
             {i + 1}
           </button>
         ))}
         <button
           onClick={() => handlePageChange(pageNo + 1)}
-          disabled={pageNo === totalPages}
+          disabled={pageNo === totalPages - 1}
           className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
         >
           Next
