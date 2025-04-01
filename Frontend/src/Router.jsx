@@ -2,6 +2,7 @@ import React from "react";
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
 import { Home, Register, Login, Blogs, SingleBlog, About, AllAuthors, Dashboard, UpdateBlog,UserProfile } from "./components/pages/index";
 import App from "./App";
+import Followings from "./components/pages/Following";
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,6 +17,7 @@ const Router = createBrowserRouter(
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="blog/update/:id" element={<UpdateBlog />} />
       <Route path="blog/userProfile/:id" element={<UserProfile />} />
+      <Route path="followings" element={<Followings />} />
     </Route>
   )
 );
