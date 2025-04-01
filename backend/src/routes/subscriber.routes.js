@@ -5,6 +5,6 @@ const router=express.Router()
 
 router.route('/newSubscriber/:id').post(verifyJWT,createSubscriber)
 router.route('/deleteSubscriber/:id').delete(verifyJWT,deleteSubscriber)
-router.route('/allSubscrubedAuhtorInfo').get(verifyJWT,getAllUserSubscriberInfo)
+router.route('/allSubscribedAuhtorInfo').get(verifyJWT,getAllUserSubscriberInfo)
 
 export {router}

@@ -208,7 +208,7 @@ const getMyProfile=asyncHandler(async(req,res)=>{
 const getAllAuthors = asyncHandler(async (req, res) => {
   let { skip = 0, limit = 9 } = req.query;
 
-  console.log("Received query params:", req.query);
+  // console.log("Received query params:", req.query);
 
   // Ensure values are properly converted to numbers with defaults
   skip = Number(skip) || 0;
