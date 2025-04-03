@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ErrorComp from "../../utility/ErrorPage";
@@ -13,51 +13,54 @@ function AllAuthors() {
   const [skip, setSkip] = useState(0);
   const limit = 12;
 
-  useEffect(() => {
-    let isMounted = true; // Prevents memory leaks
+  const observerRef = useRef(null); // Reference for the intersection observer
 
-    const fetchAuthors = async () => {
-      try {
-        setLoader(true);
-        const response = await axios.get("/api/v1/user/authors", {
-          params: { skip, limit: limit + 1 },
-        });
+  const fetchAuthors = useCallback(async () => {
+    try {
+      setLoader(true);
+      const response = await axios.get("/api/v1/user/authors", {
+        params: { skip, limit: limit + 1 },
+      });
 
-        if (isMounted) {
-          const data = response.data.data;
-          console.log("Fetched Authors:", response);
-          setAllAuthorData((prevData) => [...prevData, ...data.slice(0, limit)]);
-          setHasNext(data.length > limit);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err.response?.data?.message || "Failed to fetch authors");
-        }
-      } finally {
-        if (isMounted) {
-          setLoader(false);
-        }
-      }
-    };
-
-    fetchAuthors();
-
-    return () => {
-      isMounted = false; // Cleanup function
-    };
+      const data = response.data.data;
+      setAllAuthorData((prevData) => [...prevData, ...data.slice(0, limit)]);
+      setHasNext(data.length > limit);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch authors");
+    } finally {
+      setLoader(false);
+    }
   }, [skip]);
 
-  // Function to handle "Next" button click without scrolling to top
-  const handleNext = () => {
-    const scrollPosition = window.scrollY; // Save current scroll position
-    setSkip((prevSkip) => prevSkip + limit); // Load more authors
-    setTimeout(() => {
-      window.scrollTo({ top: scrollPosition, behavior: "instant" }); // Restore scroll position
-    }, 0);
-  };
+  useEffect(() => {
+    fetchAuthors();
+  }, [fetchAuthors]);
+
+  useEffect(() => {
+    if (!hasNext) return; // Stop observing if no more authors
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setSkip((prevSkip) => prevSkip + limit); // Load more authors when sentinel is visible
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNext]);
 
   if (error) return <ErrorComp data={error} />;
-  if (loader) return <Loader />;
+  if (loader && skip === 0) return <Loader />; // Show loader only for the initial load
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
@@ -67,7 +70,7 @@ function AllAuthors() {
           allAuthorData.map((author) => (
             <div
               key={author._id}
-              onClick={() => navigate(`/blog/userProfile/${author._id}`)}
+              onClick={() => navigate(`/userProfile/${author._id}`)}
               className="border-4 border-white p-6 rounded-lg flex flex-col items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:border-purple-300 cursor-pointer"
             >
               <img
@@ -92,17 +95,9 @@ function AllAuthors() {
           <p className="text-white text-center text-lg">No authors found.</p>
         )}
       </div>
-      {hasNext && (
-        <div className="flex justify-center mt-6">
-          <button
-            type="button"
-            onClick={handleNext}
-            className="bg-white text-purple-900 px-4 py-2 rounded-lg font-semibold hover:bg-purple-300"
-          >
-            Next
-          </button>
-        </div>
-      )}
+
+      {/* Invisible div to trigger infinite scrolling */}
+      {hasNext && <div ref={observerRef} className="h-10"></div>}
     </div>
   );
 }

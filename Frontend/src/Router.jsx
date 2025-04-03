@@ -1,6 +1,6 @@
 import React from "react";
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
-import { Home, Register, Login, Blogs, SingleBlog, About, AllAuthors, Dashboard, UpdateBlog,UserProfile } from "./components/pages/index";
+import { Home, Register, Login, Blogs, SingleBlog, About, AllAuthors, Dashboard, UpdateBlog,UserProfile,EditProfile } from "./components/pages/index";
 import App from "./App";
 
 const Router = createBrowserRouter(
@@ -13,9 +13,11 @@ const Router = createBrowserRouter(
       <Route path="blog/:id" element={<SingleBlog />} />
       <Route path="about" element={<About />} />
       <Route path="authors" element={<AllAuthors />} />
-      <Route path="dashboard" element={<Dashboard />} />
+      <Route path="dashboard" element={<Dashboard />}/>  
+      <Route path="editProfile" element={<EditProfile/>}/>
       <Route path="blog/update/:id" element={<UpdateBlog />} />
-      <Route path="blog/userProfile/:id" element={<UserProfile />} />
+      <Route path="userProfile/:id" element={<UserProfile />}/>
+          
     </Route>
   )
 );

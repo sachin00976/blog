@@ -8,6 +8,7 @@ import Register from "./Register";
 import SingleBlog from "./SingleBlog";
 import UpdateBlog from "./UpdateBlog";
 import UserProfile from "./UserProfile";
+import EditProfile from "./EditProfile";
 
 export{About,
     AllAuthors,
@@ -18,5 +19,6 @@ export{About,
     Register,
     SingleBlog,
     UpdateBlog,
-    UserProfile
+    UserProfile,
+    EditProfile,
 }
