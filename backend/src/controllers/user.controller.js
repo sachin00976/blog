@@ -23,8 +23,8 @@ const genrateAccessTokenAndRefreshToken=async(userid)=>{
     }
 }
 const options = {
-    httpOnly: true //preveent accessing the cookie from clien site javascript
-    // secure: true
+    httpOnly: true ,//preveent accessing the cookie from clien site javascript
+    secure: true
   }
 const register = asyncHandler(async (req, res) => {
     if(!req.files || Object.keys(req.files).length===0)
