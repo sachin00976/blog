@@ -7,7 +7,7 @@ import Loader from "../../utility/Loader";
 function AllAuthors() {
   const navigate = useNavigate();
   const [allAuthorData, setAllAuthorData] = useState([]);
-  const [loader, setLoader] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageNo, setPageNo] = useState(0);
   const [limit, setLimit] = useState(4);
@@ -16,8 +16,8 @@ function AllAuthors() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/v1/user/authors?skip=${pageNo * limit}&limit=${limit}`);
-      setAllAuthorData(response.data.data.allAuthorInfo);
+      const response = await axios.get(`/api/v1/user/authors?page=${pageNo}&limit=${limit}`);
+      setAllAuthorData(response.data.data.allAuthors);
       setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {
       setError(err.message);

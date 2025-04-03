@@ -8,28 +8,16 @@ import axios from "axios";
 
 function FollowedBlogs() {
   const [blogData, setBlogData] = useState(null);
-  const [showAllTags, setShowAllTags] = useState(false);
-  const [loader, setLoader] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedTag, setSelectedTag] = useState("All");
-
-  const tags = [
-    "All", "Travel", "Anime", "Lifestyle", "Education", "Tech",
-    "Gaming", "Health", "Food", "Finance", "Business", "Art",
-    "Music", "Photography", "Science", "Sports", "Movies", "Books",
-    "History", "Other"
-  ];
 
   const visibleTags = 6; // Number of tags to show initially
   const displayedTags = showAllTags ? tags : tags.slice(0, visibleTags);
 
   const getDataQuery = async (queryType) => {
-    setLoader(true);
+    setLoading(true);
     try {
-      const response = await axios.get(`/api/v1/blog/getAllBlog`, {
-        params: {
-          tag: queryType, // send tag in query string
-        },
+      const response = await axios.get(`/api/v1/subscribe/getUserSubscribedAuthorBlogs`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -37,7 +25,6 @@ function FollowedBlogs() {
       });
 
       setBlogData(response.data.data);
-      console.log("data: ", response.data.data);
     } catch (err) {
       setError(err.message);
     } finally {
