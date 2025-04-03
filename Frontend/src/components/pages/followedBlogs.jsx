@@ -11,13 +11,10 @@ function FollowedBlogs() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const visibleTags = 6; // Number of tags to show initially
-  const displayedTags = showAllTags ? tags : tags.slice(0, visibleTags);
-
-  const getDataQuery = async (queryType) => {
+  const getDataQuery = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/v1/subscribe/getUserSubscribedAuthorBlogs`, {
+      const response = await axios.get(`api/v1/subscribe/getUserSubscribedAuthorBlogs`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -28,22 +25,19 @@ function FollowedBlogs() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoader(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (data) {
-      setBlogData(data);
-    }
-  }, [data]);
+    getDataQuery();
+  }, []);
 
-  if (error || apiError) {
-    console.log("Error page is encountered");
-    return <ErrorComp data={error || apiError} />;
+  if (error) {
+    return <ErrorComp data={error} />;
   }
 
-  if (loader || apiLoader) {
+  if (loading) {
     return <Loader />;
   }
 
@@ -51,35 +45,6 @@ function FollowedBlogs() {
     <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 p-6">
       {/* Title */}
       <h1 className="text-white text-3xl font-bold text-center mb-6">BLOGS</h1>
-
-      {/* Tags search */}
-      <div className="flex flex-wrap items-center gap-3">
-        {displayedTags.map((tag) => (
-          <button
-            key={tag}
-            onClick={() => {
-              getDataQuery(tag);
-              setSelectedTag(tag);
-            }}
-            className={`${
-              tag === selectedTag
-                ? "bg-purple-500 text-white"
-                : "bg-purple-700 text-white"
-            } px-4 py-2 rounded-full transition-all duration-300 hover:bg-purple-500 shadow-md`}
-          >
-            {tag}
-          </button>
-        ))}
-
-        {/* Expand/Collapse Button */}
-        <button
-          onClick={() => setShowAllTags(!showAllTags)}
-          className="ml-auto flex items-center gap-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-full transition-all duration-300 hover:bg-gray-300 shadow-md"
-        >
-          {showAllTags ? "Collapse" : "Expand"}
-          {showAllTags ? <FaAngleDoubleUp /> : <FaAngleDoubleDown />}
-        </button>
-      </div>
 
       {/* Blog Grid Container */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mt-5">

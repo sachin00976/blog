@@ -10,7 +10,7 @@ function AllAuthors() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageNo, setPageNo] = useState(0);
-  const [limit, setLimit] = useState(4);
+  const [limit, setLimit] = useState(8);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchData = async () => {
@@ -29,7 +29,6 @@ function AllAuthors() {
   const handlePageChange = (page) => {
     if (page >= 0 && page < totalPages) {
       setPageNo(page);
-      fetchData(page, limit);
     }
   };
 
