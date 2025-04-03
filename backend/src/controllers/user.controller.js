@@ -207,10 +207,10 @@ const getMyProfile=asyncHandler(async(req,res)=>{
     )
 })
 const getAllAuthors = asyncHandler(async (req, res) => {
-  let { page = 0, limit = 9 } = req.query;
+  let { page = 0, limit = 8 } = req.query;
 
   page = Number(page) || 0;
-  limit = Number(limit) || 9;
+  limit = Number(limit) || 8;
   let skip = (page > 0 ? (page) * limit : 0);
 
   console.log("Processed values -> Skip:", skip, "Limit:", limit);
