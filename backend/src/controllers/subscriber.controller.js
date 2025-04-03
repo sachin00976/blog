@@ -152,19 +152,23 @@ const getAllUserSubscriberInfo = asyncHandler(async (req, res) => {
     new ApiResponse(200, response, "All user's subscribed author info fetched successfully")
   );
 });
-const getUserSubscribedAuthorBlogs=asyncHandler(async(req,res)=>{
-  const userId=req.body.id;
-  const allBlogArrResponse=await Subscriber.aggregate([
+const getUserSubscribedAuthorBlogs = asyncHandler(async (req, res) => {
+  const userId = req.user.id; 
+
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(400, "Invalid User Id");
+  }
+
+  const allBlogArrResponse = await Subscriber.aggregate([
     {
       $match: {
-        "subscriberId":ObjectId('67dabeb56c505b24db229327')
-  
+        subscriberId: new ObjectId(userId)
       }
     },
     {
       $lookup: {
         from: "blogs",
-        localField:"authorId",
+        localField: "authorId",
         foreignField: "createdBy",
         as: "blogsArr"
       }
@@ -172,40 +176,33 @@ const getUserSubscribedAuthorBlogs=asyncHandler(async(req,res)=>{
     {
       $addFields: {
         blogsArr: {
-         $sortArray:{
-           input:"$blogsArr",
-            sortBy:{createdAt:-1}
-         }
-        }
-      }
-    },
-    {
-      $addFields: {
-        blogsArr:{
-          $slice:["$blogsArr",5]
+          $slice: [
+            { $sortArray: { input: "$blogsArr", sortBy: { createdAt: -1 } } }, 2]
         }
       }
     },
     {
       $project: {
-        "blogsArr":1
+        blogsArr: 1
       }
     }
-  ])
+  ]);
 
-  if(!allBlogArrResponse)
-  {
-    throw new ApiError(500,"Error Occured While Fetching All Subscribed Author Blogs")
+  if (!allBlogArrResponse.length) {
+    return res.status(200).json(
+      new ApiResponse(200, [], "No blogs found for subscribed authors")
+    );
   }
-  return res.status(200).json(
-    new ApiResponse(200,allBlogArrResponse,"Latest Blog Of Subscribed Author Fetched Sucessfully")
-  )
 
-})
+  return res.status(200).json(
+    new ApiResponse(200, allBlogArrResponse, "Latest blogs of subscribed authors fetched successfully")
+  );
+});
 
 export  {
     createSubscriber,
     deleteSubscriber,
-    getAllUserSubscriberInfo
+    getAllUserSubscriberInfo,
+    getUserSubscribedAuthorBlogs
     
 }

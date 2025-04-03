@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
+import { ObjectId } from "mongodb";
 
 const blogPost = asyncHandler(async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -135,17 +136,45 @@ const deleteBlog = asyncHandler(async (req, res) => {
   )
 })
 const getAllBlogs = asyncHandler(async (req, res) => {
-  const { tag } = req.query; 
+  const { tag="All" } = req.query;
   let filteredTag = tag === "All" ? "" : tag;
-  let blogs;
-  if (!filteredTag) {
-    blogs = await Blog.find({ "published": true }).select("-published -createdAt -updatedAt -__v");
-  } else {
-    blogs = await Blog.find({
-      "published": true,
-      "category": filteredTag,
-    }).select("-published -createdAt -updatedAt -__v");
+
+  const matchStage = { published: true };
+  if (filteredTag) {
+    matchStage.category = filteredTag;
   }
+
+  const blogs = await Blog.aggregate([
+    { $match: matchStage }, 
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorInfo"
+      }
+    },
+    {
+      $addFields: {
+        "authorInfo": { $arrayElemAt: ["$authorInfo", 0] }
+      }
+    },
+    {
+      $addFields: {
+        "authorAvatar": "$authorInfo.avatar.url",
+        "authorName": "$authorInfo.name"
+      }
+    },
+    {
+      $project: {
+        authorInfo: 0, 
+        published: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0
+      }
+    }
+  ]);
 
   if (!blogs) {
     throw new ApiError(500, "Blogs Fetch Unsuccessful!");
@@ -154,28 +183,59 @@ const getAllBlogs = asyncHandler(async (req, res) => {
   return res.status(200).json(
     new ApiResponse(200, blogs, "Blogs fetched successfully")
   );
-
 });
 
+
 const getSingleBlog = asyncHandler(async (req, res) => {
-
-
-  const { id } = req.params
+  const { id } = req.params;
 
   if (!id) {
-    throw new ApiError(404, "ID is invalid")
+    throw new ApiError(404, "ID is invalid");
   }
 
-  const blog = await Blog.findById(id).select("-published -__v -updatedAt -createdAt")
+  const blog = await Blog.aggregate([
+    { 
+      $match: { _id: new ObjectId(id) } 
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorInfo"
+      }
+    },
+    {
+      $addFields: {
+        "authorInfo": { $arrayElemAt: ["$authorInfo", 0] }
+      }
+    },
+    {
+      $addFields: {
+        "authorAvatar": "$authorInfo.avatar.url",
+        "authorName": "$authorInfo.name"
+      }
+    },
+    {
+      $project: {
+        authorInfo: 0, // Exclude authorInfo array
+        published: 0,
+        __v: 0,
+        updatedAt: 0,
+        createdAt: 0
+      }
+    }
+  ]);
 
-  if (!blog) {
-    throw new ApiError(400, "Blog not found!")
+  if (!blog || blog.length === 0) {
+    throw new ApiError(400, "Blog not found!");
   }
+
   return res.status(200).json(
-    new ApiResponse(200, blog, "Blog fetched successfully!")
-  )
+    new ApiResponse(200, blog[0], "Blog fetched successfully!")
+  );
+});
 
-})
 const updateBlog = asyncHandler(async (req, res) => {
   const { id } = req.params
   if (!id) {

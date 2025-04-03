@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import Sidebar from '../miniComponents/sidebar'
 function Dashboard() {
   const {user}=useContext(Context)
+  console.log("user:",user);
   const navigate=useNavigate()
   const {res,data,error,loader}=useApiHandler({
     url:"/api/v1/user/allUserBlog"
@@ -76,15 +77,23 @@ function Dashboard() {
         </div>
       </div>
   
-      {/* Button to create a new blog */}
-      <div className="mt-10 text-center">
-        <button
-          onClick={() => navigate('/blogs')}
-          className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
-        >
-          Create New Blog
-        </button>
-      </div>
+     
+      <div className="flex gap-4 mt-10 justify-center">
+         {/* Button to create a new blog */}
+  {user.role==="Author"?(<button
+    onClick={() => navigate('/blogs')}
+    className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+  >
+    Create New Blog
+  </button>):null}
+
+  {/* <button
+    onClick={() => navigate('/editProfile')}
+    className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-200"
+  >
+    Edit Profile
+  </button> */}
+  </div>
   
       {/* User Blogs */}
       <div className="mt-16">

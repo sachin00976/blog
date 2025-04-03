@@ -72,14 +72,6 @@ const blogSchema=mongoose.Schema({
         ref: "User",
         required: true,
       },
-      authorName: {
-        type: String,
-        required: true,
-      },
-      authorAvatar: {
-        type: String,
-        required: true,
-      },
       published: {
         type: Boolean,
         default: false,
