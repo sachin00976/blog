@@ -15,10 +15,10 @@ function Followings() {
   const [limit, setLimit] = useState(4);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchData = async (page = pageNo, lim = limit) => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/v1/subscribe/allSubscribedAuhtorInfo?page=${page}&limit=${limit}`);
+      const response = await axios.get(`/api/v1/subscribe/allSubscribedAuhtorInfo?page=${pageNo}&limit=${limit}`);
       setData(response.data.data.allAuthorInfo);
       setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {
@@ -29,7 +29,7 @@ function Followings() {
   };
 
   useEffect(() => {
-    fetchData(pageNo, limit);
+    fetchData();
   }, [pageNo, limit]);
 
   if (error) return <ErrorComp data={error} />;
@@ -38,7 +38,7 @@ function Followings() {
   const handlePageChange = (page) => {
     if (page >= 0 && page < totalPages) {
       setPageNo(page);
-      fetchData(page, limit);
+      fetchData();
     }
   };
 
