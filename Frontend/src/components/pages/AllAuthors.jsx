@@ -6,58 +6,39 @@ import Loader from "../../utility/Loader";
 
 function AllAuthors() {
   const navigate = useNavigate();
-  const [hasNext, setHasNext] = useState(false);
   const [allAuthorData, setAllAuthorData] = useState([]);
   const [loader, setLoader] = useState(true);
   const [error, setError] = useState(null);
-  const [skip, setSkip] = useState(0);
-  const limit = 12;
+  const [pageNo, setPageNo] = useState(0);
+  const [limit, setLimit] = useState(4);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    let isMounted = true; // Prevents memory leaks
-
-    const fetchAuthors = async () => {
-      try {
-        setLoader(true);
-        const response = await axios.get("/api/v1/user/authors", {
-          params: { skip, limit: limit + 1 },
-        });
-
-        if (isMounted) {
-          const data = response.data.data;
-          console.log("Fetched Authors:", response);
-          setAllAuthorData((prevData) => [...prevData, ...data.slice(0, limit)]);
-          setHasNext(data.length > limit);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err.response?.data?.message || "Failed to fetch authors");
-        }
-      } finally {
-        if (isMounted) {
-          setLoader(false);
-        }
-      }
-    };
-
-    fetchAuthors();
-
-    return () => {
-      isMounted = false; // Cleanup function
-    };
-  }, [skip]);
-
-  // Function to handle "Next" button click without scrolling to top
-  const handleNext = () => {
-    const scrollPosition = window.scrollY; // Save current scroll position
-    setSkip((prevSkip) => prevSkip + limit); // Load more authors
-    setTimeout(() => {
-      window.scrollTo({ top: scrollPosition, behavior: "instant" }); // Restore scroll position
-    }, 0);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`/api/v1/user/authors?skip=${pageNo * limit}&limit=${limit}`);
+      setAllAuthorData(response.data.data.allAuthorInfo);
+      setTotalPages(Math.ceil(response.data.data.total / limit));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handlePageChange = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setPageNo(page);
+      fetchData(page, limit);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [pageNo]);
+
   if (error) return <ErrorComp data={error} />;
-  if (loader) return <Loader />;
+  if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
@@ -92,17 +73,32 @@ function AllAuthors() {
           <p className="text-white text-center text-lg">No authors found.</p>
         )}
       </div>
-      {hasNext && (
-        <div className="flex justify-center mt-6">
+      {/* Pagination */}
+      <div className="flex justify-center mt-6 space-x-2">
+        <button
+          onClick={() => handlePageChange(pageNo - 1)}
+          disabled={pageNo === 0}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        {[...Array(totalPages)].map((_, i) => (
           <button
-            type="button"
-            onClick={handleNext}
-            className="bg-white text-purple-900 px-4 py-2 rounded-lg font-semibold hover:bg-purple-300"
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`px-4 py-2 ${pageNo === i ? 'bg-purple-500 text-white' : 'bg-gray-300'} rounded`}
           >
-            Next
+            {i + 1}
           </button>
-        </div>
-      )}
+        ))}
+        <button
+          onClick={() => handlePageChange(pageNo + 1)}
+          disabled={pageNo === totalPages - 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
