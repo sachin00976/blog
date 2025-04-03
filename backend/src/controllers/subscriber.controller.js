@@ -152,6 +152,8 @@ const getAllUserSubscriberInfo = asyncHandler(async (req, res) => {
     new ApiResponse(200, response, "All user's subscribed author info fetched successfully")
   );
 });
+
+
 const getUserSubscribedAuthorBlogs = asyncHandler(async (req, res) => {
   const userId = req.user.id; 
 
@@ -159,7 +161,7 @@ const getUserSubscribedAuthorBlogs = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid User Id");
   }
 
-  const allBlogArrResponse = await Subscriber.aggregate([
+  const allBlogsResponse = await Subscriber.aggregate([
     {
       $match: {
         subscriberId: new ObjectId(userId)
@@ -174,30 +176,32 @@ const getUserSubscribedAuthorBlogs = asyncHandler(async (req, res) => {
       }
     },
     {
-      $addFields: {
-        blogsArr: {
-          $slice: [
-            { $sortArray: { input: "$blogsArr", sortBy: { createdAt: -1 } } }, 2]
-        }
+      $unwind: "$blogsArr"
+    },
+    {
+      $sort: { "blogsArr.createdAt": -1 }
+    },
+    {
+      $group: {
+        _id: null,
+        blogs: { $push: "$blogsArr" }
       }
     },
     {
       $project: {
-        blogsArr: 1
+        _id: 0,
+        blogs: 1
       }
     }
   ]);
 
-  if (!allBlogArrResponse.length) {
-    return res.status(200).json(
-      new ApiResponse(200, [], "No blogs found for subscribed authors")
-    );
-  }
+  const blogs = allBlogsResponse.length ? allBlogsResponse[0].blogs : [];
 
   return res.status(200).json(
-    new ApiResponse(200, allBlogArrResponse, "Latest blogs of subscribed authors fetched successfully")
+    new ApiResponse(200, blogs, "Latest blogs of subscribed authors fetched successfully")
   );
 });
+
 
 export  {
     createSubscriber,
