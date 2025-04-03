@@ -6,61 +6,39 @@ import Loader from "../../utility/Loader";
 
 function AllAuthors() {
   const navigate = useNavigate();
-  const [hasNext, setHasNext] = useState(false);
   const [allAuthorData, setAllAuthorData] = useState([]);
   const [loader, setLoader] = useState(true);
   const [error, setError] = useState(null);
-  const [skip, setSkip] = useState(0);
-  const limit = 12;
+  const [pageNo, setPageNo] = useState(0);
+  const [limit, setLimit] = useState(4);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const observerRef = useRef(null); // Reference for the intersection observer
-
-  const fetchAuthors = useCallback(async () => {
+  const fetchData = async () => {
     try {
-      setLoader(true);
-      const response = await axios.get("/api/v1/user/authors", {
-        params: { skip, limit: limit + 1 },
-      });
-
-      const data = response.data.data;
-      setAllAuthorData((prevData) => [...prevData, ...data.slice(0, limit)]);
-      setHasNext(data.length > limit);
+      setLoading(true);
+      const response = await axios.get(`/api/v1/user/authors?skip=${pageNo * limit}&limit=${limit}`);
+      setAllAuthorData(response.data.data.allAuthorInfo);
+      setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch authors");
+      setError(err.message);
     } finally {
-      setLoader(false);
+      setLoading(false);
     }
-  }, [skip]);
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setPageNo(page);
+      fetchData(page, limit);
+    }
+  };
 
   useEffect(() => {
-    fetchAuthors();
-  }, [fetchAuthors]);
-
-  useEffect(() => {
-    if (!hasNext) return; // Stop observing if no more authors
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setSkip((prevSkip) => prevSkip + limit); // Load more authors when sentinel is visible
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [hasNext]);
+    fetchData();
+  }, [pageNo]);
 
   if (error) return <ErrorComp data={error} />;
-  if (loader && skip === 0) return <Loader />; // Show loader only for the initial load
+  if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
@@ -95,9 +73,32 @@ function AllAuthors() {
           <p className="text-white text-center text-lg">No authors found.</p>
         )}
       </div>
-
-      {/* Invisible div to trigger infinite scrolling */}
-      {hasNext && <div ref={observerRef} className="h-10"></div>}
+      {/* Pagination */}
+      <div className="flex justify-center mt-6 space-x-2">
+        <button
+          onClick={() => handlePageChange(pageNo - 1)}
+          disabled={pageNo === 0}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`px-4 py-2 ${pageNo === i ? 'bg-purple-500 text-white' : 'bg-gray-300'} rounded`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageChange(pageNo + 1)}
+          disabled={pageNo === totalPages - 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
