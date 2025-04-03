@@ -6,6 +6,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Subscriber } from "../models/subscriberSchema.js";
 import { ObjectId } from "mongodb";
 import { jwtDecode } from "jwt-decode";
+
 const genrateAccessTokenAndRefreshToken=async(userid)=>{
     try {
         const user=await User.findById(userid)
@@ -206,24 +207,36 @@ const getMyProfile=asyncHandler(async(req,res)=>{
     )
 })
 const getAllAuthors = asyncHandler(async (req, res) => {
-  let { skip = 0, limit = 9 } = req.query;
+  let { page = 0, limit = 9 } = req.query;
 
-  // console.log("Received query params:", req.query);
-
-  // Ensure values are properly converted to numbers with defaults
-  skip = Number(skip) || 0;
+  page = Number(page) || 0;
   limit = Number(limit) || 9;
+  let skip = (page > 0 ? (page) * limit : 0);
 
   console.log("Processed values -> Skip:", skip, "Limit:", limit);
+  const totalCountResponse=await User.aggregate([
+    {
+      $match: { 
+              role: "Author"
+            },
+            
+    },
+    {
+      $count:"totalDataCount"
+    }
 
+  ])
   const authors = await User.find({ role: "Author" }).skip(skip).limit(limit);
 
   if (authors.length === 0) {
       throw new ApiError(404, "No authors found");
   }
-
+  const response={
+    total:totalCountResponse[0]?.totalDataCount || 0,
+    allAuthors:authors
+  }
   return res.status(200).json(
-      new ApiResponse(200, authors, "All authors fetched successfully")
+      new ApiResponse(200, response, "All authors fetched successfully")
   );
 });
 
