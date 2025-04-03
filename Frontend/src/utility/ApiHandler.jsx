@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 
 const useApiHandler = ({ url, method = 'get', body = {}, headers = {} }) => {
+    console.log("Inside ap i handler");
     const [res, setRes] = useState(null);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);

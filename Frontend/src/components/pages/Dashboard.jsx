@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import useApiHandler from '../../utility/ApiHandler'
 import ErrorComp from '../../utility/ErrorPage'
 import { Link } from 'react-router-dom'
+import Sidebar from '../miniComponents/sidebar'
 function Dashboard() {
   const {user}=useContext(Context)
   console.log("user:",user);
@@ -35,6 +36,7 @@ function Dashboard() {
 
   return (
     <>
+    <Sidebar />
     <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white py-10 px-12 rounded-lg shadow-lg">
       {/* Heading */}
       <h2 className="text-center text-5xl font-extrabold tracking-wide mb-10">User Profile</h2>
