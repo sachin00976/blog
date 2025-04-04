@@ -104,7 +104,7 @@ function Dashboard() {
         (
           
           <div className='flex flex-wrap gap-10 bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 '>
-       {data && data[0].blogs !== null && data[0].blogs.length !== 0 && data[0].blogs.map((blog) => (
+       {data && data !== null && data.blogs?.length !== 0 && data.blogs.map((blog) => (
         
         <Link
           to={`/blog/${blog._id}`}
@@ -134,7 +134,7 @@ function Dashboard() {
             <div className="flex items-center mt-4">
               <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
                 <img
-                  src={blog.authorAvatar}
+                  src={blog.authorAvatar.url}
                   alt={blog.authorName}
                   className="w-full h-full object-cover"
                 />

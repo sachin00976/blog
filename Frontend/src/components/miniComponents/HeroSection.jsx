@@ -30,16 +30,15 @@ function HeroSection() {
     "Photography", "Design"
   ];
 
-  const visibleTags = 6; // Number of tags to show initially
+  const visibleTags = 6; 
   const displayedTags = showAllTags ? tags : tags.slice(0, visibleTags);
 
   const getDataQuery = async (queryType) => {
-    console.log("queryType: ", queryType);
     setLoader(true);
     try {
       const response = await axios.get(`/api/v1/blog/getAllBlog`, {
         params: {
-          tag: queryType, // send tag in query string
+          tag: queryType, 
         },
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +47,6 @@ function HeroSection() {
       });
 
       setBlogData(response.data.data);
-      console.log("data: ", response.data.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,7 +61,6 @@ function HeroSection() {
   }, [data]);
 
   if (error || apiError) {
-    console.log("Error page is encountered");
     return <ErrorComp data={error || apiError} />;
   }
 
@@ -73,10 +70,8 @@ function HeroSection() {
 
   return (
     <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 p-6">
-      {/* Title */}
       <h1 className="text-white text-3xl font-bold text-center mb-6">BLOGS</h1>
 
-      {/* Tags search */}
       <div className="flex flex-wrap items-center gap-3">
         {displayedTags.map((tag) => (
           <button
@@ -95,7 +90,6 @@ function HeroSection() {
           </button>
         ))}
 
-        {/* Expand/Collapse Button */}
         <button
           onClick={() => setShowAllTags(!showAllTags)}
           className="ml-auto flex items-center gap-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-full transition-all duration-300 hover:bg-gray-300 shadow-md"
@@ -105,40 +99,34 @@ function HeroSection() {
         </button>
       </div>
 
-      {/* Blog Grid Container */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mt-5">
-        {blogData !== null &&
-          blogData.length !== 0 &&
-          blogData.map((blog) => (
+      {blogData === null || blogData.length === 0 ? (
+       <div className="text-white text-center mt-10 text-lg font-semibold flex justify-center items-center min-h-[50vh]">
+          No blogs found
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mt-5 min-h-[50vh]">
+          {blogData.map((blog) => (
             <Link
               to={`/blog/${blog._id}`}
               key={blog._id}
               className="bg-white text-black rounded-2xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
             >
-              {/* Image Section */}
               <div className="h-44 relative">
                 <img
                   src={blog.mainImage.url}
                   className="w-full h-full object-cover rounded-t-2xl"
                   alt="Blog Cover"
                 />
-                {/* Category Badge */}
                 <div className="absolute top-4 left-4 bg-black bg-opacity-90 text-white text-base font-bold px-4 py-2 rounded-full shadow-md uppercase tracking-wide">
                   {blog.category}
                 </div>
               </div>
 
-              {/* Content Section */}
               <div className="p-5">
-                {/* Title */}
                 <h2 className="text-xl font-extrabold text-gray-900 leading-tight hover:text-purple-700 transition">
                   {blog.title}
                 </h2>
-
-                {/* Divider */}
                 <div className="w-full h-[2px] bg-gray-300 my-3"></div>
-
-                {/* User Info */}
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-gray-300 overflow-hidden">
                     <img
@@ -152,7 +140,8 @@ function HeroSection() {
               </div>
             </Link>
           ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

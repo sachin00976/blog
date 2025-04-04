@@ -64,7 +64,7 @@ function Followings() {
           data.map((following) => (
             <div
               key={following.authorId}
-              onClick={() => navigate(`/userProfile/${following.authorId}`)}
+              onClick={() => navigate(`/blog/userProfile/${following.authorId}`)}
               className="border-4 border-white p-6 rounded-lg flex flex-col items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:border-purple-300"
             >
               <img

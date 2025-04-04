@@ -47,7 +47,7 @@ function AllAuthors() {
           allAuthorData.map((author) => (
             <div
               key={author._id}
-              onClick={() => navigate(`/userProfile/${author._id}`)}
+              onClick={() => navigate(`/blog/userProfile/${author._id}`)}
               className="border-4 border-white p-6 rounded-lg flex flex-col items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:border-purple-300 cursor-pointer"
             >
               <img

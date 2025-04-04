@@ -121,8 +121,8 @@ function UserProfile() {
             <div className="flex flex-wrap gap-10 bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900">
               {data &&
                 data?.blogs !== null &&
-                data?.blogs[0].blogs.length !== 0 &&
-                data?.blogs[0]?.blogs.map((blog) => (
+                data?.blogs.length !== 0 &&
+                data?.blogs.map((blog) => (
                   <Link
                     to={`/blog/${blog._id}`}
                     key={blog._id}
@@ -143,7 +143,7 @@ function UserProfile() {
                       <div className="text-lg font-bold text-gray-800">{blog.title}</div>
                       <div className="flex items-center mt-4">
                         <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
-                          <img src={blog.authorAvatar} alt={blog.authorName} className="w-full h-full object-cover" />
+                          <img src={blog.authorAvatar.url} alt={blog.authorName} className="w-full h-full object-cover" />
                         </div>
                         <span className="ml-2 text-gray-700 font-medium">{blog.authorName}</span>
                       </div>

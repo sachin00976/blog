@@ -240,49 +240,51 @@ const getAllAuthors = asyncHandler(async (req, res) => {
   );
 });
 
-const getAllUserBlog=asyncHandler(async(req,res)=>{
-    const user=req.user
-   
-    const allBlogs=await User.aggregate(
-        [
-            {
-              $match: {
-                _id: new ObjectId(user._id) // Closing brace added here
-              }
-            },
-            {
-              $lookup: {
-                from: "blogs",
-                localField: "_id",
-                foreignField: "createdBy",
-                as: "blogs"
-              }
-            },
-            {
-              $project: {
-                blogs: {
-                  $map: {
-                    input: "$blogs",
-                    as: "blog",
-                    in: {
-                      _id: "$$blog._id",
-                      mainImage: "$$blog.mainImage",
-                      category: "$$blog.category",
-                      title: "$$blog.title",
-                      authorAvatar: "$$blog.authorAvatar",
-                      authorName: "$$blog.authorName"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-          
-    )
-    return res.status(200).json(
-        new ApiResponse(200,allBlogs,"All users blogs fetched successfully")
-    )
-})
+const getAllUserBlog = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(400, "Invalid User Id");
+  }
+
+  const allBlogsResponse = await User.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(userId)
+      }
+    },
+    {
+      $lookup: {
+        from: "blogs",
+        localField: "_id",
+        foreignField: "createdBy",
+        as: "blogs"
+      }
+    },
+    {
+      $project: {
+        blogs: 1,
+        _id: 0
+      }
+    },
+  
+  ]);
+  const allBlogs=allBlogsResponse[0].blogs
+  const userInfo = await User.findById(userId);
+  if(!allBlogsResponse || !userInfo)
+  {
+    throw new ApiError(500,"Error Occured While Fetching Users Blogs")
+  }
+  allBlogs.forEach(blog => {
+    blog.authorAvatar = userInfo.avatar;
+    blog.authorName = userInfo.name;
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, {blogs:allBlogs}, "All user's blogs fetched successfully")
+  );
+});
+
 const getUserProfile=asyncHandler(async(req,res)=>{
   const userId=req.user._id;
   const {id}=req.params;
@@ -339,46 +341,37 @@ const getUserProfile=asyncHandler(async(req,res)=>{
 
  }
 //  console.log("SUbRESPONSE:",SubResponse)
- const allBlogs=await User.aggregate(
-  [
-      {
-        $match: {
-          _id: new ObjectId(otherUserId) // Closing brace added here
-        }
-      },
-      {
-        $lookup: {
-          from: "blogs",
-          localField: "_id",
-          foreignField: "createdBy",
-          as: "blogs"
-        }
-      },
-      {
-        $project: {
-          blogs: {
-            $map: {
-              input: "$blogs",
-              as: "blog",
-              in: {
-                _id: "$$blog._id",
-                mainImage: "$$blog.mainImage",
-                category: "$$blog.category",
-                title: "$$blog.title",
-                authorAvatar: "$$blog.authorAvatar",
-                authorName: "$$blog.authorName"
-              }
-            }
-          }
-        }
-      }
-    ]
-    
-)
-  if(!allBlogs)
+const allBlogsResponse = await User.aggregate([
   {
-    throw new ApiError(500,"something went wrong while fetching user blog")
+    $match: {
+      _id: new ObjectId(otherUserId)
+    }
+  },
+  {
+    $lookup: {
+      from: "blogs",
+      localField: "_id",
+      foreignField: "createdBy",
+      as: "blogs"
+    }
+  },
+  {
+    $project: {
+      blogs: 1,
+      _id: 0
+    }
+  },
+
+]);
+const allBlogs=allBlogsResponse[0].blogs
+if(!allBlogsResponse )
+  {
+    throw new ApiError(500,"Error Occured While Fetching Users Blogs")
   }
+  allBlogs.forEach(blog => {
+    blog.authorAvatar = otherUserInfo.avatar;
+    blog.authorName = otherUserInfo.name;
+  });
   const userInfo={subscriberCount:subscriberCount,subscribed:subscribed,...otherUserInfo._doc,blogs:allBlogs}
   
   console.log("userInfo:",userInfo)
