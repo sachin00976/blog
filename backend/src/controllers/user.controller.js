@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/userSchema.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Subscriber } from "../models/subscriberSchema.js";
 import { ObjectId } from "mongodb";
 import { jwtDecode } from "jwt-decode";
@@ -33,7 +33,8 @@ const register = asyncHandler(async (req, res) => {
         throw new ApiError(404,"User Avatar Requires!")
     }
     const avatar=req.files.avatar || req.files['avatar[]']
-    // console.log(req.files)
+    console.log("req file:",req.files)
+    console.log("req bdy",req.body)
     const allowedFormat=["image/png","image/jpeg","image/webp"]
     if(!allowedFormat.includes(avatar.mimetype))
     {
@@ -477,7 +478,61 @@ const googleLogin=asyncHandler(async (req,res)=>{
       .cookie("refreshToken", refreshToken, options)
       .json(new ApiResponse(201, userWithSubscriptionCount, "User logged in successfully"));
   });
-
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+  
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(500, "User Not Found. Please Try Again");
+    }
+  
+    const { name, phone, education } = req.body;
+    if (!name) {
+      throw new ApiError(404, "User Name Is Required");
+    }
+  
+    const newUserData = {
+      name,
+      phone,
+      education,
+    };
+  
+    if (req.files && Object.keys(req.files).length > 0) {
+      const avatar = req.files.avatar || req.files["avatar[]"];
+      const allowedFormat = ["image/png", "image/jpeg", "image/webp"];
+  
+      if (!allowedFormat.includes(avatar.mimetype)) {
+        throw new ApiError(
+          404,
+          "Invalid file type. Please provide your avatar in png, jpg or webp format."
+        );
+      }
+  
+      const uploadResponse = await uploadOnCloudinary(avatar.tempFilePath);
+      if (!uploadResponse) {
+        throw new ApiError(500, "Failed To Upload New Profile. Please Try Again");
+      }
+  
+      if (user.avatar?.public_id) {
+        await deleteOnCloudinary(user.avatar.public_id);
+      }
+  
+      newUserData.avatar = {
+        public_id: uploadResponse.public_id,
+        url: uploadResponse.secure_url,
+      };
+    }
+  
+    const updatedUser = await User.findByIdAndUpdate(userId, newUserData, {
+      new: true,
+      runValidators: true,
+    });
+  
+    return res.status(200).json(
+      new ApiResponse(200, updatedUser, "User Updated Successfully")
+    );
+  });
+  
 export {
     register,
     login,
@@ -487,7 +542,8 @@ export {
     getAllUserBlog,
     getUserProfile,
     googleRegister,
-    googleLogin
+    googleLogin,
+    updateUserProfile,
 
 
 };
