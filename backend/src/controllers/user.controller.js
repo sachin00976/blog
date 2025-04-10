@@ -578,6 +578,40 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       new ApiResponse(200, authors, "Most subscribed authors fetched successfully")
     );
   });
+  const searchAuthors = asyncHandler(async (req, res) => {
+    let { query, page = 0, limit = 8 } = req.query;
+  
+    if (!query || query.trim() === "") {
+      throw new ApiError(400, "Search query is required");
+    }
+  
+    page = Number(page);
+    limit = Number(limit);
+    const skip = page * limit;
+  
+    const regex = new RegExp(query, "i");
+  
+    const searchFilter = {
+      role: "Author",
+      $or: [
+        { name: { $regex: regex } },
+        { email: { $regex: regex } }
+      ]
+    };
+  
+  
+    const total = await User.countDocuments(searchFilter);
+  
+    
+    const authors = await User.find(searchFilter)
+      .skip(skip)
+      .limit(limit)
+      .select("-password -refreshToken -__v -createdAt -updatedAt");
+  
+    return res.status(200).json(
+      new ApiResponse(200, { total, authors }, "Search results fetched successfully")
+    );
+  });
   
 export {
     register,
@@ -590,7 +624,8 @@ export {
     googleRegister,
     googleLogin,
     updateUserProfile,
-    mostSubscribedAuthor
+    mostSubscribedAuthor,
+    searchAuthors
 
 
 };
