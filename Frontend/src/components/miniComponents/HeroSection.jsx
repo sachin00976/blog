@@ -5,14 +5,20 @@ import Loader from "../../utility/Loader";
 import { Link } from "react-router-dom";
 import { FaAngleDoubleDown, FaAngleDoubleUp } from "react-icons/fa";
 import axios from "axios";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 function HeroSection() {
   const [blogData, setBlogData] = useState(null);
+  const [bestAuthors, setBestAuthors] = useState([]);
   const [showAllTags, setShowAllTags] = useState(false);
   const [loader, setLoader] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState("All");
-  
+
   let { res, data, error: apiError, loader: apiLoader } = useApiHandler({
     url: "/api/v1/blog/getAllBlog",
   });
@@ -30,7 +36,7 @@ function HeroSection() {
     "Photography", "Design"
   ];
 
-  const visibleTags = 6; 
+  const visibleTags = 6;
   const displayedTags = showAllTags ? tags : tags.slice(0, visibleTags);
 
   const getDataQuery = async (queryType) => {
@@ -38,7 +44,7 @@ function HeroSection() {
     try {
       const response = await axios.get(`/api/v1/blog/getAllBlog`, {
         params: {
-          tag: queryType, 
+          tag: queryType,
         },
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +60,26 @@ function HeroSection() {
     }
   };
 
+  const fetchBestAuthors = async () => {
+    setLoader(true);
+    try {
+      const response = await axios.get(`/api/v1/user/mostSubsAuthor`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+
+      setBestAuthors(response.data.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoader(false);
+    }
+  };
+
   useEffect(() => {
+    fetchBestAuthors();
     if (data) {
       setBlogData(data);
     }
@@ -80,11 +105,10 @@ function HeroSection() {
               getDataQuery(tag);
               setSelectedTag(tag);
             }}
-            className={`${
-              tag === selectedTag
+            className={`${tag === selectedTag
                 ? "bg-purple-500 text-white"
                 : "bg-purple-700 text-white"
-            } px-4 py-2 rounded-full transition-all duration-300 hover:bg-purple-500 shadow-md`}
+              } px-4 py-2 rounded-full transition-all duration-300 hover:bg-purple-500 shadow-md`}
           >
             {tag}
           </button>
@@ -99,8 +123,48 @@ function HeroSection() {
         </button>
       </div>
 
+      {bestAuthors.length > 0 && (
+        <div className="my-10">
+          <h2 className="text-white text-2xl font-bold mb-6 text-center">Top Authors</h2>
+
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={20}
+            slidesPerView={3}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 3000 }}
+            breakpoints={{
+              1024: { slidesPerView: 3 },
+              768: { slidesPerView: 2 },
+              0: { slidesPerView: 1 },
+            }}
+          >
+            {bestAuthors.map((author) => (
+              <SwiperSlide key={author._id}>
+                <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center">
+                  <img
+                    src={author.avatar.url}
+                    alt={author.name}
+                    className="w-20 h-20 rounded-full object-cover border-4 border-purple-600 mb-4"
+                  />
+                  <h3 className="text-lg font-bold text-gray-900">{author.name}</h3>
+                  <p className="text-sm text-gray-600">{author.email}</p>
+                  <p className="mt-2 text-purple-700 font-semibold">
+                    Subscribers: {author.subCount}
+                  </p>
+                  {/* Optional: View profile link */}
+                  {/* <Link to={`/profile/${author._id}`} className="text-purple-500 mt-2 underline text-sm">View Profile</Link> */}
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      )}
+
+
       {blogData === null || blogData.length === 0 ? (
-       <div className="text-white text-center mt-10 text-lg font-semibold flex justify-center items-center min-h-[50vh]">
+        <div className="text-white text-center mt-10 text-lg font-semibold flex justify-center items-center min-h-[50vh]">
           No blogs found
         </div>
       ) : (
