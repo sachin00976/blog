@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useApiHandler from '../../utility/ApiHandler';
+import axios from 'axios';
 import ErrorComp from '../../utility/ErrorPage';
 import Loader from '../../utility/Loader';
-import axios from 'axios';
 
 function Followings() {
   const navigate = useNavigate();
-
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,14 +36,12 @@ function Followings() {
   const handlePageChange = (page) => {
     if (page >= 0 && page < totalPages) {
       setPageNo(page);
-      fetchData();
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
       <h1 className="text-4xl font-bold text-center text-white mb-8">Your Followings</h1>
-      {/* Limit Selector */}
       <div className="flex justify-end mb-4">
         <label className="text-white mr-2">Items per page:</label>
         <select
@@ -64,7 +60,7 @@ function Followings() {
           data.map((following) => (
             <div
               key={following.authorId}
-              onClick={() => navigate(`/blog/userProfile/${following.authorId}`)}
+              onClick={() => navigate(`/userProfile/${following.authorId}`)}
               className="border-4 border-white p-6 rounded-lg flex flex-col items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:border-purple-300"
             >
               <img
@@ -85,7 +81,6 @@ function Followings() {
           <p className="text-white text-center text-lg">No followings found.</p>
         )}
       </div>
-      {/* Pagination */}
       <div className="flex justify-center mt-6 space-x-2">
         <button
           onClick={() => handlePageChange(pageNo - 1)}
