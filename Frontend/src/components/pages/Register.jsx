@@ -113,6 +113,7 @@ function Register() {
               <option value="PHD">PHD</option>
               <option value="10Th pass">10Th pass</option>
               <option value="12Th pass">12Th pass</option>
+              <option value="Other">Other</option>
             </select>
             {errors.education && <p className="text-sm text-red-500 mt-1">{errors.education.message}</p>}
           </div>

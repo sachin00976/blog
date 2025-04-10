@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/userSchema.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Subscriber } from "../models/subscriberSchema.js";
 import { ObjectId } from "mongodb";
 import { jwtDecode } from "jwt-decode";
@@ -33,7 +33,8 @@ const register = asyncHandler(async (req, res) => {
         throw new ApiError(404,"User Avatar Requires!")
     }
     const avatar=req.files.avatar || req.files['avatar[]']
-    // console.log(req.files)
+    console.log("req file:",req.files)
+    console.log("req bdy",req.body)
     const allowedFormat=["image/png","image/jpeg","image/webp"]
     if(!allowedFormat.includes(avatar.mimetype))
     {
@@ -240,49 +241,51 @@ const getAllAuthors = asyncHandler(async (req, res) => {
   );
 });
 
-const getAllUserBlog=asyncHandler(async(req,res)=>{
-    const user=req.user
-   
-    const allBlogs=await User.aggregate(
-        [
-            {
-              $match: {
-                _id: new ObjectId(user._id) // Closing brace added here
-              }
-            },
-            {
-              $lookup: {
-                from: "blogs",
-                localField: "_id",
-                foreignField: "createdBy",
-                as: "blogs"
-              }
-            },
-            {
-              $project: {
-                blogs: {
-                  $map: {
-                    input: "$blogs",
-                    as: "blog",
-                    in: {
-                      _id: "$$blog._id",
-                      mainImage: "$$blog.mainImage",
-                      category: "$$blog.category",
-                      title: "$$blog.title",
-                      authorAvatar: "$$blog.authorAvatar",
-                      authorName: "$$blog.authorName"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-          
-    )
-    return res.status(200).json(
-        new ApiResponse(200,allBlogs,"All users blogs fetched successfully")
-    )
-})
+const getAllUserBlog = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(400, "Invalid User Id");
+  }
+
+  const allBlogsResponse = await User.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(userId)
+      }
+    },
+    {
+      $lookup: {
+        from: "blogs",
+        localField: "_id",
+        foreignField: "createdBy",
+        as: "blogs"
+      }
+    },
+    {
+      $project: {
+        blogs: 1,
+        _id: 0
+      }
+    },
+  
+  ]);
+  const allBlogs=allBlogsResponse[0].blogs
+  const userInfo = await User.findById(userId);
+  if(!allBlogsResponse || !userInfo)
+  {
+    throw new ApiError(500,"Error Occured While Fetching Users Blogs")
+  }
+  allBlogs.forEach(blog => {
+    blog.authorAvatar = userInfo.avatar;
+    blog.authorName = userInfo.name;
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, {blogs:allBlogs}, "All user's blogs fetched successfully")
+  );
+});
+
 const getUserProfile=asyncHandler(async(req,res)=>{
   const userId=req.user._id;
   const {id}=req.params;
@@ -339,46 +342,37 @@ const getUserProfile=asyncHandler(async(req,res)=>{
 
  }
 //  console.log("SUbRESPONSE:",SubResponse)
- const allBlogs=await User.aggregate(
-  [
-      {
-        $match: {
-          _id: new ObjectId(otherUserId) // Closing brace added here
-        }
-      },
-      {
-        $lookup: {
-          from: "blogs",
-          localField: "_id",
-          foreignField: "createdBy",
-          as: "blogs"
-        }
-      },
-      {
-        $project: {
-          blogs: {
-            $map: {
-              input: "$blogs",
-              as: "blog",
-              in: {
-                _id: "$$blog._id",
-                mainImage: "$$blog.mainImage",
-                category: "$$blog.category",
-                title: "$$blog.title",
-                authorAvatar: "$$blog.authorAvatar",
-                authorName: "$$blog.authorName"
-              }
-            }
-          }
-        }
-      }
-    ]
-    
-)
-  if(!allBlogs)
+const allBlogsResponse = await User.aggregate([
   {
-    throw new ApiError(500,"something went wrong while fetching user blog")
+    $match: {
+      _id: new ObjectId(otherUserId)
+    }
+  },
+  {
+    $lookup: {
+      from: "blogs",
+      localField: "_id",
+      foreignField: "createdBy",
+      as: "blogs"
+    }
+  },
+  {
+    $project: {
+      blogs: 1,
+      _id: 0
+    }
+  },
+
+]);
+const allBlogs=allBlogsResponse[0].blogs
+if(!allBlogsResponse )
+  {
+    throw new ApiError(500,"Error Occured While Fetching Users Blogs")
   }
+  allBlogs.forEach(blog => {
+    blog.authorAvatar = otherUserInfo.avatar;
+    blog.authorName = otherUserInfo.name;
+  });
   const userInfo={subscriberCount:subscriberCount,subscribed:subscribed,...otherUserInfo._doc,blogs:allBlogs}
   
   console.log("userInfo:",userInfo)
@@ -484,7 +478,61 @@ const googleLogin=asyncHandler(async (req,res)=>{
       .cookie("refreshToken", refreshToken, options)
       .json(new ApiResponse(201, userWithSubscriptionCount, "User logged in successfully"));
   });
-
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+  
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(500, "User Not Found. Please Try Again");
+    }
+  
+    const { name, phone, education } = req.body;
+    if (!name) {
+      throw new ApiError(404, "User Name Is Required");
+    }
+  
+    const newUserData = {
+      name,
+      phone,
+      education,
+    };
+  
+    if (req.files && Object.keys(req.files).length > 0) {
+      const avatar = req.files.avatar || req.files["avatar[]"];
+      const allowedFormat = ["image/png", "image/jpeg", "image/webp"];
+  
+      if (!allowedFormat.includes(avatar.mimetype)) {
+        throw new ApiError(
+          404,
+          "Invalid file type. Please provide your avatar in png, jpg or webp format."
+        );
+      }
+  
+      const uploadResponse = await uploadOnCloudinary(avatar.tempFilePath);
+      if (!uploadResponse) {
+        throw new ApiError(500, "Failed To Upload New Profile. Please Try Again");
+      }
+  
+      if (user.avatar?.public_id) {
+        await deleteOnCloudinary(user.avatar.public_id);
+      }
+  
+      newUserData.avatar = {
+        public_id: uploadResponse.public_id,
+        url: uploadResponse.secure_url,
+      };
+    }
+  
+    const updatedUser = await User.findByIdAndUpdate(userId, newUserData, {
+      new: true,
+      runValidators: true,
+    });
+  
+    return res.status(200).json(
+      new ApiResponse(200, updatedUser, "User Updated Successfully")
+    );
+  });
+  
 export {
     register,
     login,
@@ -494,7 +542,8 @@ export {
     getAllUserBlog,
     getUserProfile,
     googleRegister,
-    googleLogin
+    googleLogin,
+    updateUserProfile,
 
 
 };

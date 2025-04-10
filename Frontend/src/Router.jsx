@@ -18,7 +18,7 @@ const Router = createBrowserRouter(
       <Route path="dashboard" element={<Dashboard />}/>  
       <Route path="editProfile" element={<EditProfile/>}/>
       <Route path="blog/update/:id" element={<UpdateBlog />} />
-      <Route path="blog/userProfile/:id" element={<UserProfile />} />
+      <Route path="userProfile/:id" element={<UserProfile />} />
       <Route path="followings" element={<Followings />} />
       <Route path="followedBlogs" element={<FollowedBlogs />} />
     </Route>
