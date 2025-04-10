@@ -19,4 +19,5 @@ router.route('/updateUserProfile').patch(verifyJWT,updateUserProfile)
 router.route("/mostSubsAuthor").get(mostSubscribedAuthor)
 
 
+
 export {router};

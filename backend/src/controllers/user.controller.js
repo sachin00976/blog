@@ -208,38 +208,46 @@ const getMyProfile=asyncHandler(async(req,res)=>{
     )
 })
 const getAllAuthors = asyncHandler(async (req, res) => {
-  let { page = 0, limit = 8 } = req.query;
+  let { query, page = 0, limit = 8 } = req.query;
 
   page = Number(page) || 0;
   limit = Number(limit) || 8;
-  let skip = (page > 0 ? (page) * limit : 0);
+  const skip = page * limit;
 
-  console.log("Processed values -> Skip:", skip, "Limit:", limit);
-  const totalCountResponse=await User.aggregate([
-    {
-      $match: { 
-              role: "Author"
-            },
-            
-    },
-    {
-      $count:"totalDataCount"
-    }
+  const baseFilter = { role: "Author" };
+  let searchFilter = { ...baseFilter };
 
-  ])
-  const authors = await User.find({ role: "Author" }).skip(skip).limit(limit);
-
-  if (authors.length === 0) {
-      throw new ApiError(404, "No authors found");
+  if (query && query.trim() !== "") {
+    const regex = new RegExp(query, "i");
+    searchFilter = {
+      ...baseFilter,
+      $or: [
+        { name: { $regex: regex } },
+        { email: { $regex: regex } }
+      ]
+    };
   }
-  const response={
-    total:totalCountResponse[0]?.totalDataCount || 0,
-    allAuthors:authors
+
+  const total = await User.countDocuments(searchFilter);
+  const authors = await User.find(searchFilter)
+    .skip(skip)
+    .limit(limit)
+    .select("-password -refreshToken -__v -createdAt -updatedAt");
+
+  if (!authors.length) {
+    throw new ApiError(404, "No authors found");
   }
+
+  const response = {
+    total,
+    allAuthors: authors
+  };
+
   return res.status(200).json(
-      new ApiResponse(200, response, "All authors fetched successfully")
+    new ApiResponse(200, response, "Authors fetched successfully")
   );
 });
+
 
 const getAllUserBlog = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -578,6 +586,40 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       new ApiResponse(200, authors, "Most subscribed authors fetched successfully")
     );
   });
+  const searchAuthors = asyncHandler(async (req, res) => {
+    let { query, page = 0, limit = 8 } = req.query;
+  
+    if (!query || query.trim() === "") {
+      throw new ApiError(400, "Search query is required");
+    }
+  
+    page = Number(page);
+    limit = Number(limit);
+    const skip = page * limit;
+  
+    const regex = new RegExp(query, "i");
+  
+    const searchFilter = {
+      role: "Author",
+      $or: [
+        { name: { $regex: regex } },
+        { email: { $regex: regex } }
+      ]
+    };
+  
+  
+    const total = await User.countDocuments(searchFilter);
+  
+    
+    const authors = await User.find(searchFilter)
+      .skip(skip)
+      .limit(limit)
+      .select("-password -refreshToken -__v -createdAt -updatedAt");
+  
+    return res.status(200).json(
+      new ApiResponse(200, { total, authors }, "Search results fetched successfully")
+    );
+  });
   
 export {
     register,
@@ -590,7 +632,8 @@ export {
     googleRegister,
     googleLogin,
     updateUserProfile,
-    mostSubscribedAuthor
+    mostSubscribedAuthor,
+   
 
 
 };
