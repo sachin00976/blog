@@ -532,6 +532,52 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       new ApiResponse(200, updatedUser, "User Updated Successfully")
     );
   });
+  const mostSubscribedAuthor = asyncHandler(async (req, res) => {
+    const authors = await User.aggregate([
+      {
+        $lookup: {
+          from: "subscribers",
+          localField: "_id",
+          foreignField: "authorId",
+          as: "subCount"
+        }
+      },
+      {
+        $addFields: {
+          subCount: {
+            $size: {
+              $ifNull: ["$subCount", []]
+            }
+          }
+        }
+      },
+      {
+        $sort: {
+          subCount: -1
+        }
+      },
+      {
+        $project: {
+          refreshToken: 0,
+          password: 0,
+          updatedAt: 0,
+          createdAt: 0,
+          __v: 0
+        }
+      },
+      {
+        $limit: 10
+      }
+    ]);
+  
+    if (!authors) {
+      throw new ApiError(404, "Error occurred while fetching most subscribed authors");
+    }
+  
+    return res.status(200).json(
+      new ApiResponse(200, authors, "Most subscribed authors fetched successfully")
+    );
+  });
   
 export {
     register,
@@ -544,6 +590,7 @@ export {
     googleRegister,
     googleLogin,
     updateUserProfile,
+    mostSubscribedAuthor
 
 
 };
