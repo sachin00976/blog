@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useApiHandler from "../../utility/ApiHandler";
 import ErrorComp from "../../utility/ErrorPage";
 import Loader from "../../utility/Loader";
@@ -12,6 +13,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 function HeroSection() {
+  const navigate = useNavigate();
   const [blogData, setBlogData] = useState(null);
   const [bestAuthors, setBestAuthors] = useState([]);
   const [showAllTags, setShowAllTags] = useState(false);
@@ -95,6 +97,50 @@ function HeroSection() {
 
   return (
     <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 p-6">
+      {bestAuthors.length > 0 && (
+        <div className="my-10">
+
+          {bestAuthors.length > 0 && (
+            <div className="my-10 bg-purple-900 bg-opacity-30 py-10 px-4 rounded-xl shadow-lg">
+              <h2 className="text-white text-2xl font-bold mb-6 text-center">Top Authors</h2>
+
+              <Swiper
+                modules={[Navigation, Pagination, Autoplay]}
+                spaceBetween={20}
+                slidesPerView={4}
+                navigation
+                pagination={{ clickable: true }}
+                autoplay={{ delay: 3000 }}
+                breakpoints={{
+                  1280: { slidesPerView: 4 },
+                  1024: { slidesPerView: 3 },
+                  768: { slidesPerView: 2 },
+                  0: { slidesPerView: 1 },
+                }}
+              >
+                {bestAuthors.map((author) => (
+                  <SwiperSlide key={author._id}>
+                    <div className="bg-transparent border border-white rounded-xl shadow-md p-6 flex flex-col items-center text-center">
+                      <img
+                        src={author.avatar.url}
+                        alt={author.name}
+                        className="w-20 h-20 rounded-full object-cover border-4 border-white mb-4"
+                      />
+                      <h3 className="text-lg font-bold text-white cursor-pointer" onClick={() => navigate(`/userProfile/${author._id}`)} >{author.name}</h3>
+                      <p className="text-sm text-white">{author.email}</p>
+                      <p className="mt-2 text-white font-semibold">
+                        Subscribers: {author.subCount}
+                      </p>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
+
+        </div>
+      )}
+
       <h1 className="text-white text-3xl font-bold text-center mb-6">BLOGS</h1>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -106,8 +152,8 @@ function HeroSection() {
               setSelectedTag(tag);
             }}
             className={`${tag === selectedTag
-                ? "bg-purple-500 text-white"
-                : "bg-purple-700 text-white"
+              ? "bg-purple-500 text-white"
+              : "bg-purple-700 text-white"
               } px-4 py-2 rounded-full transition-all duration-300 hover:bg-purple-500 shadow-md`}
           >
             {tag}
@@ -122,46 +168,6 @@ function HeroSection() {
           {showAllTags ? <FaAngleDoubleUp /> : <FaAngleDoubleDown />}
         </button>
       </div>
-
-      {bestAuthors.length > 0 && (
-        <div className="my-10">
-          <h2 className="text-white text-2xl font-bold mb-6 text-center">Top Authors</h2>
-
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            spaceBetween={20}
-            slidesPerView={3}
-            navigation
-            pagination={{ clickable: true }}
-            autoplay={{ delay: 3000 }}
-            breakpoints={{
-              1024: { slidesPerView: 3 },
-              768: { slidesPerView: 2 },
-              0: { slidesPerView: 1 },
-            }}
-          >
-            {bestAuthors.map((author) => (
-              <SwiperSlide key={author._id}>
-                <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center">
-                  <img
-                    src={author.avatar.url}
-                    alt={author.name}
-                    className="w-20 h-20 rounded-full object-cover border-4 border-purple-600 mb-4"
-                  />
-                  <h3 className="text-lg font-bold text-gray-900">{author.name}</h3>
-                  <p className="text-sm text-gray-600">{author.email}</p>
-                  <p className="mt-2 text-purple-700 font-semibold">
-                    Subscribers: {author.subCount}
-                  </p>
-                  {/* Optional: View profile link */}
-                  {/* <Link to={`/profile/${author._id}`} className="text-purple-500 mt-2 underline text-sm">View Profile</Link> */}
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      )}
-
 
       {blogData === null || blogData.length === 0 ? (
         <div className="text-white text-center mt-10 text-lg font-semibold flex justify-center items-center min-h-[50vh]">
