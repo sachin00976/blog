@@ -98,4 +98,4 @@ function FollowedBlogs() {
   );
 }
 
-export default HeroSection;
+export default FollowedBlogs;

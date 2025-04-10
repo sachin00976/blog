@@ -3,6 +3,7 @@ import { createBrowserRouter, createRoutesFromElements, Route } from "react-rout
 import { Home, Register, Login, Blogs, SingleBlog, About, AllAuthors, Dashboard, UpdateBlog,UserProfile,EditProfile } from "./components/pages/index";
 import App from "./App";
 import Followings from "./components/pages/Following";
+import FollowedBlogs from "./components/pages/followedBlogs";
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +20,7 @@ const Router = createBrowserRouter(
       <Route path="blog/update/:id" element={<UpdateBlog />} />
       <Route path="blog/userProfile/:id" element={<UserProfile />} />
       <Route path="followings" element={<Followings />} />
+      <Route path="followedBlogs" element={<FollowedBlogs />} />
     </Route>
   )
 );
