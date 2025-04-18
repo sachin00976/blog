@@ -235,7 +235,9 @@ const getAllAuthors = asyncHandler(async (req, res) => {
     .select("-password -refreshToken -__v -createdAt -updatedAt");
 
   if (!authors.length) {
-    throw new ApiError(404, "No authors found");
+    return res.status(200).json(
+      new ApiResponse(200, {total:0,allAuthors:[]}, "NO author was found")
+    )
   }
 
   const response = {
@@ -388,104 +390,76 @@ if(!allBlogsResponse )
   new ApiResponse(200,userInfo,"Successfully fetched user data")
   )
 })
-const googleRegister=asyncHandler(async (req,res)=>{
-  console.log("called");
-    const {credential}=req.body
-    const credentialResponse=await jwtDecode(credential);
-    // console.log("Response")
-    console.log(credentialResponse)
-    const email=credentialResponse.email;
-    const password=credentialResponse.sub;
-    const name=credentialResponse.given_name;
-    const avatar=credentialResponse.picture || req.files['avatar[]']
-    // console.log(req.files)
-    const allowedFormat=["image/png","image/jpeg","image/webp"]
-   
-    const user = await User.findOne({ email });
-    if (user) {
-        throw new ApiError(404, "User with given email already exists");
+
+const googleAuth = asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+  
+    if (!credential) {
+      throw new ApiError(404, "Invalid Credential || Please Try Again");
     }
-    const uploadRespone= await uploadOnCloudinary(avatar)
-    if(!uploadRespone)
-    {
-        throw new ApiError(404,"Avatar File Is Missing!")
-    }
-    //console.log(uploadRespone)
-    const response=await User.create({
-      name,
-      email,
-      password,
-      avatar:{
-          public_id:uploadRespone.public_id,
-          url:uploadRespone.secure_url,
+  
+    const credentialResponse = await jwtDecode(credential);
+    const email = credentialResponse.email;
+    const password = credentialResponse.sub;
+    const name = credentialResponse.given_name;
+    const avatar = credentialResponse.picture || req.files?.['avatar[]'];
+    let user = await User.findOne({ email });
+  
+    if (!user) {
+      
+      const uploadResponse = await uploadOnCloudinary(avatar);
+      if (!uploadResponse) {
+        throw new ApiError(404, "Avatar File Is Missing!");
       }
-  });
- 
-
-  // Fetch the created user
-  const createduser = await User.findOne({ email });
-  if (!createduser) {
-      throw new ApiError(500, "Internal DB server error! Please try again");
-  }
-
-  // Return successful response
-  console.log("user create success");
-  const {refreshToken,accessToken}=await genrateAccessTokenAndRefreshToken(createduser._id)
-
-  return res.status(201)
-  .cookie("accessToken",accessToken,options)
-  .cookie("refreshToken",refreshToken,options)
-  .json(
-      new ApiResponse(201, createduser, "User registered successfully")
-  );
-})
-const googleLogin=asyncHandler(async (req,res)=>{
-  const {credential}=req.body;
-  //console.log("called00")
-  if(!credential)
-  {
-    throw new ApiError(404,"Invalid Credential || Please Try Again")
-  }
-  const credentialResponse= await jwtDecode(credential);
-  const email=credentialResponse.email
-  const password=credentialResponse.sub;
-  if(!email || !password)
-  {
-    throw new ApiError(404,"Login unsccessful | please try again")
-  }
   
-  const user = await User.findOne({ email }).select("-createdAt -updatedAt");
-  if(!user)
-  {
-    throw new ApiError(400,"Invalid Login || PLease Register First")
-  }
-  const isPasswordValid = await user.isPasswordCorrect(password);
-    if (!isPasswordValid) {
-      throw new ApiError(404, "Invalid credential. Please try again.");
+      await User.create({
+        name,
+        email,
+        password,
+        avatar: {
+          public_id: uploadResponse.public_id,
+          url: uploadResponse.secure_url,
+        },
+      });
+  
+      user = await User.findOne({ email });
+      if (!user) {
+        throw new ApiError(500, "Internal DB server error! Please try again");
+      }
+  
+    } else {
+      const isPasswordValid = await user.isPasswordCorrect(password);
+      if (!isPasswordValid) {
+        throw new ApiError(404, "Invalid credential. Please try again.");
+      }
+  
+      const userId = user._id;
+      if (!ObjectId.isValid(userId)) {
+        throw new ApiError(404, "Invalid userId");
+      }
+  
+      const response = await Subscriber.aggregate([
+        { $match: { authorId: new ObjectId(userId) } },
+        { $count: "SubscriberCount" },
+      ]);
+  
+      if (!response) {
+        throw new ApiError(500, "Something went wrong while fetching subscriber count");
+      }
+  
+      const subscriberCount = response.length === 0 ? "0" : response[0]?.SubscriberCount || "0";
+      user = { subscriberCount, ...user._doc };
     }
-  const userId=user._id;
-  if (!ObjectId.isValid(userId)) {
-    throw new ApiError(404, "Invalid userId");
-  }
-  const response = await Subscriber.aggregate([
-    { $match: { authorId: new ObjectId(userId) } },
-    { $count: "SubscriberCount" },
-  ]);
-  if (!response) {
-    throw new ApiError(500, "Something went wrong while fetching subscriber count");
-  }
-  const subscriberCount = response.length === 0 ? "0" : response[0]?.SubscriberCount || "0";
-  const userWithSubscriptionCount = { subscriberCount, ...user._doc };
-
-  const { refreshToken, accessToken } = await genrateAccessTokenAndRefreshToken(user._id);
   
-    // Set cookies and respond with success
+    const { refreshToken, accessToken } = await genrateAccessTokenAndRefreshToken(user._id || user._doc?._id);
+  
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
-      .json(new ApiResponse(201, userWithSubscriptionCount, "User logged in successfully"));
+      .json(new ApiResponse(200 , user, "User logged in sucessfully"));
   });
+  
 const updateUserProfile = asyncHandler(async (req, res) => {
     const userId = req.user.id;
   
@@ -629,8 +603,7 @@ export {
     getAllAuthors,
     getAllUserBlog,
     getUserProfile,
-    googleRegister,
-    googleLogin,
+    googleAuth,
     updateUserProfile,
     mostSubscribedAuthor,
    
