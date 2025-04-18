@@ -170,35 +170,47 @@ const getUserSubscribedAuthorBlogs = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: "blogs",
-        localField: "authorId",
-        foreignField: "createdBy",
+        let: { authorId: "$authorId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$createdBy", "$$authorId"] } } },
+          {
+            $sort: { createdAt: -1 } 
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "createdBy",
+              foreignField: "_id",
+              as: "authorInfo"
+            }
+          },
+          { $unwind: "$authorInfo" },
+          {
+            $project: {
+              _id: 1,
+              mainImage: 1,
+              category: 1,
+              title: 1,
+              createdAt: 1,
+              authorName: "$authorInfo.name",
+              authorAvatar: "$authorInfo.avatar.url"
+            }
+          }
+        ],
         as: "blogsArr"
       }
     },
+    { $unwind: "$blogsArr" },
     {
-      $unwind: "$blogsArr"
-    },
-    {
-      $sort: { "blogsArr.createdAt": -1 }
-    },
-    {
-      $group: {
-        _id: null,
-        blogs: { $push: "$blogsArr" }
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        blogs: 1
-      }
+      $replaceRoot: { newRoot: "$blogsArr" } 
     }
-  ]);
-
-  const blogs = allBlogsResponse.length ? allBlogsResponse[0].blogs : [];
+  ]
+  );
+  // console.log(allBlogsResponse)
+ 
 
   return res.status(200).json(
-    new ApiResponse(200, blogs, "Latest blogs of subscribed authors fetched successfully")
+    new ApiResponse(200, allBlogsResponse, "Latest blogs of subscribed authors fetched successfully")
   );
 });
 
