@@ -8,7 +8,7 @@ import { Context } from '../../AppWrapper';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import {GoogleRegisterComponent,GoogleLoginComponent} from '../miniComponents/index.js'
+import {GoogleLoginComponent} from '../miniComponents/index.js'
 
 function Register() {
   const { setUser, setIsAuthenticated } = useContext(Context);
@@ -208,7 +208,7 @@ function Register() {
         </form>
           {/* google register */}
           <div className="mt-4 text-center">
-          <GoogleRegisterComponent/>
+          <GoogleLoginComponent/>
         </div>
         
         {/* Login Link */}
