@@ -20,7 +20,7 @@ function FollowedBlogs() {
         },
         withCredentials: true,
       });
-
+     
       setBlogData(response.data.data);
     } catch (err) {
       setError(err.message);
@@ -49,7 +49,7 @@ function FollowedBlogs() {
       {/* Blog Grid Container */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mt-5">
         {blogData !== null &&
-          blogData.length !== 0 &&
+          blogData?.length !== 0 &&
           blogData.map((blog) => (
             <Link
               to={`/blog/${blog._id}`}
