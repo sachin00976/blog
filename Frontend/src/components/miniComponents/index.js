@@ -7,7 +7,7 @@ import MyProfile from "./MyProfile";
 import PopularAuthor from "./PopularAuthor";
 import TrendingBlogs from "./TrendingBlogs";
 import GoogleLoginComponent from "./GoogleLogin";
-import GoogleRegisterComponent from "./GoogleRegister";
+import GoogleRegisterComponent from "./GoogleLogin";
 
 export {
     Chart,
