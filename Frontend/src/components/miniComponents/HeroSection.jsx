@@ -122,7 +122,7 @@ function HeroSection() {
                   <SwiperSlide key={author._id} onClick={() => navigate(`/userProfile/${author._id}`)}>
                     <div className="bg-transparent border border-white rounded-xl shadow-md p-6 flex flex-col items-center text-center">
                       <img
-                        src={author.avatar.url}
+                        src={author?.avatar?.url}
                         alt={author.name}
                         className="w-20 h-20 rounded-full object-cover border-4 border-white mb-4"
                       />
