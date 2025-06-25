@@ -232,7 +232,7 @@ const getAllAuthors = asyncHandler(async (req, res) => {
   const authors = await User.find(searchFilter)
     .skip(skip)
     .limit(limit)
-    .select("-password -refreshToken -__v -createdAt -updatedAt");
+    .select("-password -refreshToken -__v  -updatedAt");
 
   if (!authors.length) {
     return res.status(200).json(

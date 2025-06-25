@@ -18,6 +18,7 @@ function Followings() {
       setLoading(true);
       const response = await axios.get(`/api/v1/subscribe/allSubscribedAuhtorInfo?page=${pageNo}&limit=${limit}`);
       setData(response.data.data.allAuthorInfo);
+      console.log("allAuth",response.data.data)
       setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {
       setError(err.message);
