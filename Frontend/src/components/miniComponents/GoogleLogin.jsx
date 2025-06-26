@@ -20,7 +20,7 @@ const GoogleLoginComponent = () => {
           
           const config = {
             method: "post", 
-            url: "/api/v1/user/googleLogin",
+            url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/googleLogin`,
             data: { credential }, 
           };
 

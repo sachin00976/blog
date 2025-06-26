@@ -16,7 +16,7 @@ function UpdateBlog() {
 
 
   const { res, data,error, loader }=useApiHandler({
-    url:`/api/v1/blog/singleBlog/${id}`,
+    url:`${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/singleBlog/${id}`,
     method:"get"
   })
   
@@ -124,7 +124,7 @@ useEffect(() => {
     try {
       setGeneralError(null);
       const config={
-        url:`/api/v1/blog/update/${data._id}`,
+        url:`${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/update/${data._id}`,
         method:"put",
         data:formData,
         headers: {

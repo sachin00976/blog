@@ -16,7 +16,7 @@ function Followings() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/v1/subscribe/allSubscribedAuhtorInfo?page=${pageNo}&limit=${limit}`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/subscribe/allSubscribedAuhtorInfo?page=${pageNo}&limit=${limit}`);
       setData(response.data.data.allAuthorInfo);
       console.log("allAuth",response.data.data)
       setTotalPages(Math.ceil(response.data.data.total / limit));

@@ -17,7 +17,7 @@ function UserProfile() {
     navigate('/login')
   }
   const { res, data, error, loader } = useApiHandler({
-    url: `/api/v1/user/userProfile/${id}`,
+    url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/userProfile/${id}`,
   });
 
   // State for subscription status and subscriber count
@@ -34,7 +34,7 @@ function UserProfile() {
 
   const subscribesHandler = async () => {
     try {
-      const response = await axios.post(`/api/v1/subscribe/newSubscriber/${id}`);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/subscribe/newSubscriber/${id}`);
       if (response) {
         toast.success(response.data.message);
         setIsSubscribed(true);
@@ -48,7 +48,7 @@ function UserProfile() {
 
   const unsubscribesHandler = async () => {
     try {
-      const response = await axios.delete(`/api/v1/subscribe/deleteSubscriber/${id}`);
+      const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/v1/subscribe/deleteSubscriber/${id}`);
       if (response) {
         toast.success(response.data.message);
         setIsSubscribed(false);

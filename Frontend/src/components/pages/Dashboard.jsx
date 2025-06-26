@@ -11,7 +11,7 @@ function Dashboard() {
   console.log("user:",user);
   const navigate=useNavigate()
   const {res,data,error,loader}=useApiHandler({
-    url:"/api/v1/user/allUserBlog"
+    url:`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/allUserBlog`
   })
   if(error)
   {

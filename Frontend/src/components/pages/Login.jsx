@@ -20,7 +20,7 @@ function Login() {
     try {
       const config = {
         method: "post",
-        url: "/api/v1/user/login",
+        url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/login`,
         data: formData
       };
 
