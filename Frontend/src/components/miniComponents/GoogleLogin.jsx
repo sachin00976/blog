@@ -27,7 +27,7 @@ const GoogleLoginComponent = () => {
           const response = await axios(config);
           if(response)
           {
-            console.log("Google login: ",response)
+             localStorage.setItem('user', JSON.stringify(response.data.data));
             setUser(response.data.data);
             setIsAuthenticated(true);
             toast.success("Login successfully!")
