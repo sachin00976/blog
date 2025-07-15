@@ -4,26 +4,33 @@ import cookieParser from 'cookie-parser';
 import { router as userRouter } from './src/routes/user.routes.js';
 import { router as blogRouter } from './src/routes/blog.routes.js';
 import { router as subscriberRouter } from './src/routes/subscriber.routes.js';
-import {router as commentRouter} from "./src/routes/comment.routes.js"
+import { router as commentRouter } from "./src/routes/comment.routes.js"
 import path from 'path';
 import fileUpload from 'express-fileupload';
 
 const app = express();
 
 app.use((req, res, next) => {
-    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");  
-    res.setHeader("Cross-Origin-Embedder-Policy", "credentialless"); 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
     next();
 });
 
+const allowedOrigins = [
+    process.env.FRONTEND_URI || 'http://localhost:5173'
+]
+
 // Configure CORS
 app.use(cors({
-    origin: [], // Add allowed origins here
-    credentials: true, // Allows cookies to be sent
-    methods: ["GET", "PUT", "DELETE", "POST", "PATCH"]
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
+    credentials: true,
+    methods: ["GET", "PUT", "DELETE", "POST", "PATCH"],
 }));
 
 // Middleware for cookies and JSON parsing

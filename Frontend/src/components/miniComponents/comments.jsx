@@ -27,7 +27,7 @@ const Comments = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.post(`/api/v1/comment/getComment/${id}`, {
+                const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/comment/getComment/${id}`, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -47,7 +47,7 @@ const Comments = () => {
     const submitComment = async () => {
         setLoading(true);
         try {
-            const response = await axios.post(`/api/v1/comment/newComment/${id}`, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/comment/newComment/${id}`, {
                 comment: newComment
             },
                 {
@@ -68,7 +68,7 @@ const Comments = () => {
     const editComment = async (commentId) => {
         setLoading(true);
         try {
-            const response = await axios.post(`/api/v1/comment/editComment/${commentId}/${id}`, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/comment/editComment/${commentId}/${id}`, {
                 newComment: editCommentText
             },
                 {
@@ -88,7 +88,7 @@ const Comments = () => {
     const deleteComment = async (commentId) => {
         setLoading(true);
         try {
-            const response = await axios.post(`/api/v1/comment/deleteComment/${commentId}/${id}`,
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/comment/deleteComment/${commentId}/${id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',

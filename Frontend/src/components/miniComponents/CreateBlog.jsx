@@ -37,7 +37,7 @@ function CreateBlog() {
     try {
       setGeneralError(null);
       const config = {
-        url: "/api/v1/blog/post",
+        url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/post`,
         method: "post",
         data: formData,
         headers: {

@@ -12,7 +12,7 @@ const Navbar = () => {
     const logoutHandler=async()=>{
       try {
         const config={
-          url:"/api/v1/user/logout",
+          url:`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/logout`,
           method:"get",
           headers: {
             "Content-Type": "multipart/form-data",

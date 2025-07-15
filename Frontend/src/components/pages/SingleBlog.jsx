@@ -23,7 +23,7 @@ function SingleBlog() {
     try {
       const config = {
         method: "delete",
-        url: `/api/v1/blog/deletePost/${id}`,
+        url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/deletePost/${id}`,
         data: ''
       }
       const response = await axios(config);
@@ -39,7 +39,7 @@ function SingleBlog() {
 
   }
   const { res, data, error, loader } = useApiHandler({
-    url: `/api/v1/blog/singleBlog/${id}`,
+    url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/singleBlog/${id}`,
   });
 
   if (error) return <ErrorComp data={error} />;

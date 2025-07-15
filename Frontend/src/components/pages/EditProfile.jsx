@@ -46,7 +46,7 @@ function EditProfile() {
         formData.append('avatar', data.avatar[0]); // Send file directly
       }
 
-      const response = await axios.patch('/api/v1/user/updateUserProfile', formData, {
+      const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/updateUserProfile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -22,7 +22,7 @@ function HeroSection() {
   const [selectedTag, setSelectedTag] = useState("All");
 
   let { res, data, error: apiError, loader: apiLoader } = useApiHandler({
-    url: "/api/v1/blog/getAllBlog",
+    url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/getAllBlog`,
   });
 
   const tags = [
@@ -44,7 +44,7 @@ function HeroSection() {
   const getDataQuery = async (queryType) => {
     setLoader(true);
     try {
-      const response = await axios.get(`/api/v1/blog/getAllBlog`, {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/getAllBlog`, {
         params: {
           tag: queryType,
         },
@@ -65,7 +65,7 @@ function HeroSection() {
   const fetchBestAuthors = async () => {
     setLoader(true);
     try {
-      const response = await axios.get(`/api/v1/user/mostSubsAuthor`, {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/mostSubsAuthor`, {
         headers: {
           'Content-Type': 'application/json',
         },

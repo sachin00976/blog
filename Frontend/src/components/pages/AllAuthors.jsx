@@ -18,7 +18,7 @@ function AllAuthors() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/v1/user/authors?page=${pageNo}&limit=${limit}&query=${searchTerm}`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/authors?page=${pageNo}&limit=${limit}&query=${searchTerm}`);
       setAllAuthorData(response.data.data.allAuthors);
       setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {

@@ -31,7 +31,7 @@ function Register() {
       {console.log("form data:",formData)}
       setGeneralError(null);
       const config = {
-        url: "/api/v1/user/register",
+        url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/register`,
         method: "post",
         data: formData,
         headers: {
