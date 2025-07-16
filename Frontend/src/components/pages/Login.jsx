@@ -16,7 +16,7 @@ function Login() {
   const [generalError, setGeneralError] = useState(null);
 
   const login = async (formData) => {
-    //console.log(formData)
+    
     try {
       const config = {
         method: "post",
@@ -25,17 +25,16 @@ function Login() {
       };
 
       const response = await axios(config);
-     // console.log("login res:",response)
+     
 
       if (response && response.data) {
-        // Update user context and navigate to home
+        localStorage.setItem('user', JSON.stringify(response.data.data));
         setUser(response.data.data);
         setIsAuthenticated(true);
         navigate('/');
       }
     } catch (err) {
-      // Handle any errors
-      // console.log("login res:",err)
+      
       setGeneralError(err.response?.data?.message || err.message || "Unexpected error occurred while login the user");
     }
   };

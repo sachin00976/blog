@@ -24,6 +24,8 @@ const Navbar = () => {
         {
           setUser(null)
           setIsAuthenticated(false)
+          localStorage.removeItem('user')
+          localStorage.clear();
           toast.success(response.data.message)
           navigate('/')
 
@@ -44,7 +46,7 @@ const Navbar = () => {
         {/* Left Section: Logo and Website Name */}
         <div className="flex gap-4 items-center">
           <div className="text-2xl font-bold"><GiCurlyWing size={50} color='white'/></div>
-          <div className="text-lg font-semibold tracking-wide">WebsiteName</div>
+          <div className="text-lg font-semibold tracking-wide">Blogi</div>
         </div>
 
         {/* Middle Section: Navigation Links */}
