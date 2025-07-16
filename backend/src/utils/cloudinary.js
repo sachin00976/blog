@@ -2,14 +2,11 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import { ApiError } from "./ApiError.js";
 
-
-
 const uploadOnCloudinary = async (filePath) => {
-   
   try {
     if (!filePath) {
-        throw new ApiError(400, "File path is required");
-      }
+      throw new ApiError(400, "File path is required");
+    }
     const response = await cloudinary.uploader.upload(filePath, {
       resource_type: "auto",
     });
@@ -20,7 +17,6 @@ const uploadOnCloudinary = async (filePath) => {
       `Error while uploading file to Cloudinary: ${error.message || "Unknown error"}`
     );
   } finally {
-    
     if (fs.existsSync(filePath)) {
       try {
         fs.unlinkSync(filePath);
@@ -31,22 +27,19 @@ const uploadOnCloudinary = async (filePath) => {
   }
 };
 
-const deleteOnCloudinary=async(fileId)=>{
-    try {
-      
-      if(!fileId)
-      {
-        throw new ApiError(404,"File id is missing for deleting file on cloudinary")
-      }
-      return await cloudinary.uploader.destroy(fileId)
-    } catch (error) {
-      return res.status(err.statusCode || 400).json({
-        message:err.message,
-        statusCode:err.statusCode,
-        success:false,
-
-    });
+const deleteOnCloudinary = async (fileId) => {
+  try {
+    if (!fileId) {
+      throw new ApiError(400, "File id is missing for deleting file on cloudinary")
     }
+    return await cloudinary.uploader.destroy(fileId)
+  } catch (error) {
+    return res.status(err.statusCode || 400).json({
+      message: err.message,
+      statusCode: err.statusCode,
+      success: false,
+    });
+  }
 }
 
-export { uploadOnCloudinary,deleteOnCloudinary };
+export { uploadOnCloudinary, deleteOnCloudinary };

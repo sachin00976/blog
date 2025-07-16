@@ -5,7 +5,6 @@ import { router as userRouter } from './src/routes/user.routes.js';
 import { router as blogRouter } from './src/routes/blog.routes.js';
 import { router as subscriberRouter } from './src/routes/subscriber.routes.js';
 import { router as commentRouter } from "./src/routes/comment.routes.js"
-import path from 'path';
 import fileUpload from 'express-fileupload';
 
 const app = express();
@@ -24,14 +23,14 @@ const allowedOrigins = [
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true)
+            callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'))
+            callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true,
-    methods: ["GET", "PUT", "DELETE", "POST", "PATCH"],
+    credentials: true 
 }));
+
 
 // Middleware for cookies and JSON parsing
 app.use(cookieParser());

@@ -1,36 +1,35 @@
-import { createContext,useState } from "react"
+import { createContext, useState } from "react"
 import Router from './Router'
 import { RouterProvider } from 'react-router-dom'
-import App from './App.jsx'
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const Context=createContext({
-    isAuthenticated:false,
-    
-})
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-const AppWrapper=()=>{
-    const [isAuthenticated,setIsAuthenticated]=useState(false)
-    const [user,setUser]=useState({})
-    const [blogs,setBlogs]=useState([])
-    const [mode,setMode]=useState("dark")
+const Context = createContext(null)
 
+const AppWrapper = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [user, setUser] = useState({})
+    const [blogs, setBlogs] = useState([])
+    const [mode, setMode] = useState("dark")
 
     return (
-        <Context.Provider
-        value={{
-            user,
-            setUser,
-            isAuthenticated,
-            setIsAuthenticated,
-            blogs,
-            setBlogs,
-            mode,
-            setMode
-        }}
-        >
-            <RouterProvider router={Router}/>
-            
-        </Context.Provider>
+        <GoogleOAuthProvider clientId={clientId}>
+            <Context.Provider
+                value={{
+                    user,
+                    setUser,
+                    isAuthenticated,
+                    setIsAuthenticated,
+                    blogs,
+                    setBlogs,
+                    mode,
+                    setMode
+                }}
+            >
+                <RouterProvider router={Router} />
+            </Context.Provider>
+        </GoogleOAuthProvider>
     )
 }
-export {Context,AppWrapper}
+export { Context, AppWrapper }

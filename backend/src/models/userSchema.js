@@ -67,16 +67,14 @@ const userSchema = mongoose.Schema(
     { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) return next();
     const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
-    next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (inputPassword) 
 {
-    //console.log(this.password)
     if (!inputPassword) {
         throw new Error("Password input is missing");
     }
@@ -99,7 +97,6 @@ userSchema.methods.generateAccessToken = async function () {
         }
     );
 }
-
 
 userSchema.methods.generateRefreshToken = async function () {
     return jwt.sign(

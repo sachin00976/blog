@@ -4,8 +4,5 @@ import './index.css'
 
 import { AppWrapper } from './AppWrapper.jsx'
 createRoot(document.getElementById('root')).render(
-  // <StrictMode>
-  //   <AppWrapper/>
-  // </StrictMode>,
   <AppWrapper/>
 )

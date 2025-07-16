@@ -6,7 +6,7 @@ const dbConnect=async ()=>{
         const connectionInstance= await mongoose.connect(`${process.env.DB_URI}/${process.env.DB_NAME}`)
         if(connectionInstance)
         {
-            console.log("DB CONNECTED SUCCESSFULLY"+`|| DB HOST:${connectionInstance.connection.connect}`);
+            console.log(`DB CONNECTED || HOST: ${connectionInstance.connection.host} || DB: ${connectionInstance.connection.name}`);
         }
         else
         {
