@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Context } from '../../AppWrapper'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -20,16 +20,16 @@ function Dashboard() {
   }
   return (
     <>
-      <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white py-10 px-12 rounded-lg shadow-lg">
+      <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white py-10 px-12 shadow-lg">
         {/* Heading */}
         <h2 className="text-center text-5xl font-extrabold tracking-wide mb-10">User Profile</h2>
 
         {/* User profile info */}
         <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
           {/* Left section - image */}
-          <div className="flex-shrink-0 w-36 h-36 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-purple-300">
+          {user.avatar && user.avatar.url && <div className="flex-shrink-0 w-36 h-36 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-purple-300">
             <img className="w-full h-full object-cover" src={user.avatar.url} alt="User Avatar" />
-          </div>
+          </div>}
 
           {/* Right section - user info */}
           <div className="text-lg space-y-4">

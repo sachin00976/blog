@@ -4,13 +4,11 @@ import Footer from './components/layout/Footer'
 import { Toaster } from 'react-hot-toast'
 import { useEffect, useContext } from 'react'
 import { Context } from './AppWrapper'
-import Sidebar from './components/miniComponents/sidebar'
 function App() {
   const navigate = useNavigate()
   const { setUser, setIsAuthenticated, setBlogs } = useContext(Context)
   return (
     <>
-      <Sidebar />
       <Navbar />
       <Outlet />
       <Footer />

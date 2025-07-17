@@ -31,8 +31,6 @@ const options = {
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   const user = req.user
-  console.log("user: ", JSON.stringify(user, null, 2))
-
   if (!user) {
     throw new ApiError(404, "User not found.");
   }
