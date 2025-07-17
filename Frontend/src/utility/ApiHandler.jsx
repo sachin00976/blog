@@ -26,7 +26,7 @@ const useApiHandler = ({ url, method = 'get', body = {}, headers = {} }) => {
                
                  // Set fetched data
             } catch (err) {
-                console.log("apiHandler error",error)
+                console.log("apiHandler error",err)
                 setError({
                     statusCode: err.response?.status || 500,
                     message: err.message || "An unknown error occurred",

@@ -6,6 +6,7 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Subscriber } from "../models/subscriberSchema.js";
 import { ObjectId } from "mongodb";
 import { jwtDecode } from "jwt-decode";
+import mongoose from "mongoose";
 
 const genrateAccessTokenAndRefreshToken = async (userid) => {
   try {
@@ -25,7 +26,7 @@ const genrateAccessTokenAndRefreshToken = async (userid) => {
 const options = {
   httpOnly: true,
   secure: false,
-  sameSite: "Lax"     
+  sameSite: "Lax"
 };
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -270,7 +271,7 @@ const getAllUserBlog = asyncHandler(async (req, res) => {
 
 const getUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { id: otherUserId } = req.params;
+  let { id: otherUserId } = req.params;
 
   if (!ObjectId.isValid(otherUserId)) {
     throw new ApiError(400, "Inavalid Id")
@@ -279,6 +280,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   if (!otherUserInfo) {
     throw new ApiError(404, "Requested user not found")
   }
+  otherUserId = otherUserInfo._id
   const SubResponse = await Subscriber.aggregate(
     [
       {
@@ -288,7 +290,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       },
       {
         $group: {
-          _id: null,
+          _id: "$authorId",
           subscriberIds: {
             $addToSet: "$subscriberId"
           }
