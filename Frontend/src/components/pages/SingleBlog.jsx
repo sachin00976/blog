@@ -7,8 +7,8 @@ import { Context } from '../../AppWrapper'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import axios from 'axios';
 import Comments from '../miniComponents/comments'
+import axios from '../../utility/AxiosInstance'
 
 
 function SingleBlog() {

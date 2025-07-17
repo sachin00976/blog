@@ -23,9 +23,23 @@ const genrateAccessTokenAndRefreshToken = async (userid) => {
 }
 
 const options = {
-  httpOnly: true,//prevent accessing the cookie from clien site javascript
-  secure: true
-}
+  httpOnly: true,
+  secure: false,
+  sameSite: "Lax"     
+};
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user
+  console.log("user: ", JSON.stringify(user, null, 2))
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, user, "User is authenticated")
+  );
+});
 
 const register = asyncHandler(async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -69,8 +83,8 @@ const register = asyncHandler(async (req, res) => {
   const { refreshToken, accessToken } = await genrateAccessTokenAndRefreshToken(createduser._id)
 
   return res.status(201)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, { ...options, maxAge: 15 * 60 * 1000 })
+    .cookie("refreshToken", refreshToken, { ...options, maxAge: 7 * 24 * 60 * 60 * 1000 })
     .json(
       new ApiResponse(201, createduser, "User registered successfully")
     );
@@ -83,7 +97,7 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please enter all fields to login");
   }
 
-  const user = await User.findOne({ email }).select("-createdAt -updatedAt");
+  const user = await User.findOne({ email }).select("+password -createdAt -updatedAt");
   if (!user) {
     throw new ApiError(400, "Invalid credentials! Please enter correct email.");
   }
@@ -120,12 +134,16 @@ const login = asyncHandler(async (req, res) => {
   // Generate access and refresh tokens
   const { refreshToken, accessToken } = await genrateAccessTokenAndRefreshToken(user._id);
 
+  console.log("In backend \n");
+  console.log("accessToken:", accessToken)
+  console.log("refreshToken:", refreshToken)
+
   // Set cookies and respond with success
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(new ApiResponse(201, userWithSubscriptionCount, "User logged in successfully"));
+    .cookie("accessToken", accessToken, { ...options, maxAge: 15 * 60 * 1000 })
+    .cookie("refreshToken", refreshToken, { ...options, maxAge: 7 * 24 * 60 * 60 * 1000 })
+    .json(new ApiResponse(200, userWithSubscriptionCount, "User logged in successfully"));
 });
 
 const logout = asyncHandler(async (req, res) => {
@@ -338,7 +356,7 @@ const googleAuth = asyncHandler(async (req, res) => {
   const { credential } = req.body;
 
   if (!credential) {
-    throw new ApiError(404, "Invalid Credential || Please Try Again");
+    throw new ApiError(400, "Invalid Credential || Please Try Again");
   }
 
   const credentialResponse = await jwtDecode(credential);
@@ -346,7 +364,7 @@ const googleAuth = asyncHandler(async (req, res) => {
   const password = credentialResponse.sub;
   const name = credentialResponse.given_name;
   const avatar = credentialResponse.picture || req.files?.['avatar[]'];
-  let user = await User.findOne({ email });
+  let user = await User.findOne({ email }).select("+password -createdAt -updatedAt");;
 
   if (!user) {
 
@@ -398,8 +416,8 @@ const googleAuth = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, { ...options, maxAge: 15 * 60 * 1000 })
+    .cookie("refreshToken", refreshToken, { ...options, maxAge: 7 * 24 * 60 * 60 * 1000 })
     .json(new ApiResponse(200, user, "User logged in sucessfully"));
 });
 
@@ -551,4 +569,5 @@ export {
   googleAuth,
   updateUserProfile,
   mostSubscribedAuthor,
+  getCurrentUser
 };

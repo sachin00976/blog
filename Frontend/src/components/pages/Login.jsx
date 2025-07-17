@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Context } from '../../AppWrapper';
 import Button from '../../utility/Button';
 import Input from '../../utility/Input';
 import { Link } from 'react-router-dom';
-import {GoogleLoginComponent} from '../miniComponents/index.js'
+import { GoogleLoginComponent } from '../miniComponents/index.js'
+import axios from '../../utility/AxiosInstance.jsx';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -16,25 +16,25 @@ function Login() {
   const [generalError, setGeneralError] = useState(null);
 
   const login = async (formData) => {
-    
+
     try {
       const config = {
         method: "post",
         url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/login`,
-        data: formData
+        data: formData,
+        withCredentials: true
       };
 
       const response = await axios(config);
-     
+
 
       if (response && response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data.data));
         setUser(response.data.data);
         setIsAuthenticated(true);
         navigate('/');
       }
     } catch (err) {
-      
+
       setGeneralError(err.response?.data?.message || err.message || "Unexpected error occurred while login the user");
     }
   };
@@ -110,10 +110,10 @@ function Login() {
             Sign in
           </Button>
         </form>
-         {/* google Login */}
-           <div className="mt-4 text-center">
-            <GoogleLoginComponent/>
-            </div>
+        {/* google Login */}
+        <div className="mt-4 text-center">
+          <GoogleLoginComponent />
+        </div>
         {/* Registration Link */}
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">

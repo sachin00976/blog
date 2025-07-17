@@ -2,9 +2,9 @@ import React, { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Context } from '../../AppWrapper';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { FaCamera } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import axios from '../../utility/AxiosInstance';
 
 function EditProfile() {
   const { user, setUser } = useContext(Context);

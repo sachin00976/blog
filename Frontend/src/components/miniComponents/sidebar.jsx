@@ -6,9 +6,9 @@ import {
 } from "react-icons/fi";
 import { useContext } from "react";
 import { Context } from "../../AppWrapper";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
+import axios from "../../utility/AxiosInstance";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);

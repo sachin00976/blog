@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react"
 import Router from './Router'
 import { RouterProvider } from 'react-router-dom'
+import axios from "./utility/AxiosInstance";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -13,11 +14,23 @@ const AppWrapper = () => {
   const [blogs, setBlogs] = useState([])
 
   useEffect(() => {
-    const val = localStorage.getItem('user');
-    if (val) {
-      setUser(JSON.parse(val));
-      setIsAuthenticated(true);
-    }
+    const checkAuth = async () => {
+      try {
+        const config = {
+          method: "get",
+          url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/me`,
+          credentials: "include"
+        };
+        const response = await axios(config);
+        setUser(response.data.data);
+        setIsAuthenticated(true);
+      } catch (error) {
+        setUser({});
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   return (

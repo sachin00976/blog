@@ -4,34 +4,38 @@ import { User } from "../models/userSchema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
+  let accessToken = req.cookies?.accessToken;
+  const refreshToken = req.cookies?.refreshToken;
+
   try {
-    // Corrected: Use req.cookies instead of req.cookie
-    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-    //console.log(token)
-    if (!token) {
-      throw new ApiError(400, "Token not found!");
+    if (accessToken) {
+      const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+      const user = await User.findById(decoded.id).select("-password");
+      if (!user) throw new ApiError(401, "User not found with access token");
+      req.user = user;
+      return next();
     }
-    
-    // Verify the token
-    const decodedToken = jwt.verify(String(token), process.env.ACCESS_TOKEN_SECRET);
 
-   // console.log(decodedToken)
-    
-    // Find the user based on the decoded token's ID
-    const user = await User.findById(decodedToken.id);
-    
-    if (!user) {
-      throw new ApiError(400, "Invalid Token");
-    }
-    
-    // Attach the user object to the request object
+    if (!refreshToken) throw new ApiError(401, "Refresh token not found");
+
+    const decodedRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findById(decodedRefresh.id).select("-password");
+    if (!user) throw new ApiError(401, "User not found with refresh token");
+
+    accessToken = await user.generateAccessToken();
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 60 * 1000, 
+    });
+
     req.user = user;
-
-    // Call the next middleware in the stack
     next();
-  } catch (error) {
-    // Handle errors and provide a meaningful message
-    throw new ApiError(401, error.message || "Invalid access token");
+
+  } catch (err) {
+    throw new ApiError(401, err.message || "Authentication failed");
   }
 });
 

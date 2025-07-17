@@ -3,12 +3,11 @@ import { useForm } from 'react-hook-form';
 import { useContext } from 'react';
 import Button from '../../utility/Button';
 import Input from '../../utility/Input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Context } from '../../AppWrapper';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {GoogleLoginComponent} from '../miniComponents/index.js'
+import axios from '../../utility/AxiosInstance.jsx';
 
 function Register() {
   const { setUser, setIsAuthenticated } = useContext(Context);
@@ -28,7 +27,6 @@ function Register() {
 
   const reg = async (formData) => {
     try {
-      {console.log("form data:",formData)}
       setGeneralError(null);
       const config = {
         url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/register`,
@@ -43,7 +41,6 @@ function Register() {
       
 
       if (response && response.data) {
-        console.log("regi res:",response.data);
         setUser(response.data.data);
         setIsAuthenticated(true);
         toast.success(response.data.message)

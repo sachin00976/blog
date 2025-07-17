@@ -1,8 +1,7 @@
-import axios from 'axios';
+import axios from "./AxiosInstance";
 import { useState, useEffect } from 'react';
 
 const useApiHandler = ({ url, method = 'get', body = {}, headers = {} }) => {
-    console.log("Inside ap i handler");
     const [res, setRes] = useState(null);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
@@ -18,13 +17,10 @@ const useApiHandler = ({ url, method = 'get', body = {}, headers = {} }) => {
                     method,
                     url,
                     data: body, // Add body for POST, PATCH, etc.
-                    
+                    withCredentials: true
                 };
 
                 const response = await axios(config); // Use Axios with dynamic configuration
-                console.log("res:",response)
-                console.log("res.data:",response.data);
-                console.log("res.data.data:",response.data.data);
                 setRes(response.data);
                 setData(response.data.data)
                

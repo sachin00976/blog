@@ -4,7 +4,7 @@ import ErrorComp from "../../utility/ErrorPage";
 import Loader from "../../utility/Loader";
 import { Link } from "react-router-dom";
 import { FaAngleDoubleDown, FaAngleDoubleUp } from "react-icons/fa";
-import axios from "axios";
+import axios from "../../utility/AxiosInstance";
 
 function FollowedBlogs() {
   const [blogData, setBlogData] = useState(null);

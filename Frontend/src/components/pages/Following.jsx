@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import ErrorComp from '../../utility/ErrorPage';
 import Loader from '../../utility/Loader';
+import axios from '../../utility/AxiosInstance';
 
 function Followings() {
   const navigate = useNavigate();

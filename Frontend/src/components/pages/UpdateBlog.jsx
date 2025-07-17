@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import useApiHandler from '../../utility/ApiHandler';
 import ErrorComp from '../../utility/ErrorPage';
 import Loader from '../../utility/Loader';
+import axios from '../../utility/AxiosInstance';
 function UpdateBlog() {
  const {id}=useParams();
   

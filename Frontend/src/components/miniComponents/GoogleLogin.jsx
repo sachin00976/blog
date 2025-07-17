@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useContext } from "react";
 import { Context } from "../../AppWrapper";
 import { useNavigate } from "react-router-dom";
+import axios from "../../utility/AxiosInstance";
 
 const GoogleLoginComponent = () => {
   const { setUser, setIsAuthenticated } = useContext(Context);
@@ -15,9 +15,6 @@ const GoogleLoginComponent = () => {
     const sendCredential = async () => {
       try {
         if (credential) {
-          console.log("Google Response: ", credential);
-
-          
           const config = {
             method: "post", 
             url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/googleLogin`,
@@ -27,7 +24,6 @@ const GoogleLoginComponent = () => {
           const response = await axios(config);
           if(response)
           {
-             localStorage.setItem('user', JSON.stringify(response.data.data));
             setUser(response.data.data);
             setIsAuthenticated(true);
             toast.success("Login successfully!")

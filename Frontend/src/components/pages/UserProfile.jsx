@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Context } from '../../AppWrapper';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import useApiHandler from '../../utility/ApiHandler';
 import ErrorComp from '../../utility/ErrorPage';
 import { Link } from 'react-router-dom';
 import Loader from '../../utility/Loader';
 import toast from 'react-hot-toast';
+import axios from '../../utility/AxiosInstance';
 
 function UserProfile() {
   const { user } = useContext(Context);

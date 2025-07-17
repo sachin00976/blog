@@ -1,11 +1,12 @@
 import express from 'express'
 import { login, register,logout,getMyProfile,getAllAuthors,getAllUserBlog,getUserProfile,googleAuth,updateUserProfile
-    ,mostSubscribedAuthor
+    ,mostSubscribedAuthor, getCurrentUser
  } from '../controllers/user.controller.js'
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { roleAuth } from '../middlewares/roleAuth.middleware.js';
 const router=express.Router();
 
+router.route('/me').get(verifyJWT, getCurrentUser)
 router.route('/register').post(register)
 router.route('/login').post(login)
 router.route('/googleLogin').post(googleAuth)

@@ -59,15 +59,17 @@ const userSchema = mongoose.Schema(
             required: true,
             minLength: [8, "Password must contain at least 8 characters"],
             maxLength: [50, "Password cannot exceed 50 characters"],
+            select: false
         },
         refreshToken: {
             type: String,
+            select: false
         },
     },
     { timestamps: true }
 );
 
-userSchema.pre("save", async function () {
+userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
     this.password = await bcrypt.hash(this.password, saltRounds);

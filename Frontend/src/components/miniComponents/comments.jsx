@@ -1,9 +1,9 @@
 import { useState, useContext, useEffect } from "react";
 import { Context } from "../../AppWrapper";
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { FiMenu, FiX, FiMessageSquare } from "react-icons/fi";
 import ErrorComp from "../../utility/ErrorPage";
+import axios from "../../utility/AxiosInstance";
 
 const Comments = () => {
     const { id } = useParams();

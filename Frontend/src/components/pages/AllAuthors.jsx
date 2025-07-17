@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ErrorComp from "../../utility/ErrorPage";
 import Loader from "../../utility/Loader";
 import { LuSearch } from 'react-icons/lu';
+import axios from "../../utility/AxiosInstance";
 
 function AllAuthors() {
   const navigate = useNavigate();
