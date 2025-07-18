@@ -9,7 +9,6 @@ const blogPost = asyncHandler(async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     throw new ApiError(404, "Blog Main Image File Is Missing!");
   }
-  console.log(req.files)
   const mainImage = req.files['mainImage[]'];
   const paraOneImage = req.files['paraOneImage[]'];
   const paraTwoImage = req.files['paraTwoImage[]'];
@@ -112,10 +111,13 @@ const blogPost = asyncHandler(async (req, res) => {
 
   const blog = await Blog.create(blogData);
 
+  req.io.emit('newBlogCreated', blog);
+
   return res.status(201).json(
     new ApiResponse(201, blog, "Blog Uploaded Successfully!")
   );
 });
+
 const deleteBlog = asyncHandler(async (req, res) => {
   // console.log("delete bolg called")
   const { id } = req.params
@@ -136,7 +138,7 @@ const deleteBlog = asyncHandler(async (req, res) => {
   )
 })
 const getAllBlogs = asyncHandler(async (req, res) => {
-  const { tag="All" } = req.query;
+  const { tag = "All" } = req.query;
   let filteredTag = tag === "All" ? "" : tag;
 
   const matchStage = { published: true };
@@ -145,7 +147,7 @@ const getAllBlogs = asyncHandler(async (req, res) => {
   }
 
   const blogs = await Blog.aggregate([
-    { $match: matchStage }, 
+    { $match: matchStage },
     {
       $lookup: {
         from: "users",
@@ -167,7 +169,7 @@ const getAllBlogs = asyncHandler(async (req, res) => {
     },
     {
       $project: {
-        authorInfo: 0, 
+        authorInfo: 0,
         published: 0,
         createdAt: 0,
         updatedAt: 0,
@@ -194,8 +196,8 @@ const getSingleBlog = asyncHandler(async (req, res) => {
   }
 
   const blog = await Blog.aggregate([
-    { 
-      $match: { _id: new ObjectId(id) } 
+    {
+      $match: { _id: new ObjectId(id) }
     },
     {
       $lookup: {

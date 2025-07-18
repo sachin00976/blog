@@ -15,6 +15,16 @@ app.use((req, res, next) => {
     next();
 });
 
+let io = null;
+export const setIO = (ioInstance) => {
+    io = ioInstance;
+};
+
+app.use((req, res, next) => {
+    if (io) req.io = io;
+    next();
+});
+
 const allowedOrigins = [
     process.env.FRONTEND_URI || 'http://localhost:5173'
 ]
@@ -28,7 +38,7 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true 
+    credentials: true
 }));
 
 

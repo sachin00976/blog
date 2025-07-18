@@ -120,6 +120,7 @@ function CreateBlog() {
                 <option value="Entertainment">Entertainment</option>
                 <option value="Game">Game</option>
                 <option value="Anime">Anime</option>
+                <option value="Testing">Testing</option>
               </select>
               {errors.category && <p className="text-sm text-red-500 mt-2">{errors.category.message}</p>}
             </div>

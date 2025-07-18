@@ -11,6 +11,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import axios from "../../utility/AxiosInstance";
+import socket from "../../../src/socket/index"
 
 function HeroSection() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ function HeroSection() {
   });
 
   const tags = [
-    "All", "Travel", "Anime", "Lifestyle", "Education", "Tech",
+    "All", "Travel", "Anime", "Testing", "Lifestyle", "Education", "Tech",
     "Gaming", "Health", "Food", "Finance", "Business", "Art",
     "Music", "Photography", "Science", "Sports", "Movies", "Books",
     "History", "Philosophy", "Programming", "AI", "Machine Learning",
@@ -80,6 +81,17 @@ function HeroSection() {
     }
   };
 
+  // socket events
+  useEffect(() => {
+    socket.on('newBlogCreated', (newBlog) => {
+      setBlogData((prevBlogs) => [newBlog, ...(prevBlogs || [])]);
+    });
+
+    return () => {
+      socket.off('newBlogCreated');
+    };
+  }, []);
+
   useEffect(() => {
     fetchBestAuthors();
     if (data) {
@@ -131,7 +143,7 @@ function HeroSection() {
                       <p className="mt-2 text-white font-semibold">
                         Subscribers: {author.subCount}
                       </p>
-                      
+
                     </div>
                   </SwiperSlide>
                 ))}
