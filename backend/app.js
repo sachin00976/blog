@@ -32,6 +32,7 @@ const allowedOrigins = [
 // Configure CORS
 app.use(cors({
     origin: function (origin, callback) {
+        console.log("Incoming Origin:", origin);      // for checking which origin causing cors error
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
