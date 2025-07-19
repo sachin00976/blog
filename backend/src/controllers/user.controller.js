@@ -23,10 +23,12 @@ const genrateAccessTokenAndRefreshToken = async (userid) => {
   }
 }
 
+const isProd = process.env.NODE_ENV === "Production"
+
 const options = {
   httpOnly: true,
-  secure: false,
-  sameSite: "Lax"
+  secure: isProd,
+  sameSite: isProd ? "None" : "Lax"
 };
 
 const getCurrentUser = asyncHandler(async (req, res) => {
