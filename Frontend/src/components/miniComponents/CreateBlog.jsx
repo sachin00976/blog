@@ -3,14 +3,30 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from '../../utility/AxiosInstance';
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function CreateBlog() {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm({
+  const { register, handleSubmit, formState: { errors }, watch, setValue, trigger } = useForm({
     defaultValues: {
       paraOneImage: []
     }
   });
+
+  useEffect(() => {
+    register("intro", {
+      required: "Blog content is required",
+      minLength: {
+        value: 10,
+        message: "Content must be at least 10 characters long",
+      },
+    });
+
+    register("paraOneDescription");
+    register("paraTwoDescription");
+    register("paraThreeDescription");
+  }, [register]);
+
   const [generalError, setGeneralError] = useState("");
   const selectedMainImage = watch("mainImage");
   const selectedParaOneImage = watch("paraOneImage");
@@ -32,8 +48,6 @@ function CreateBlog() {
   }, [mainImagePreview]);
 
   const createBlogHandler = async (formData) => {
-
-    console.log("from data:", formData)
     try {
       setGeneralError(null);
       const config = {
@@ -156,21 +170,37 @@ function CreateBlog() {
 
         {/* Blog intro Editor */}
         <div className="bg-white shadow-md rounded-lg p-6 mx-10 mt-6 flex-grow">
-          <label htmlFor="intro" className="block text-gray-700 font-medium mb-2">Blog intro</label>
-          <textarea
-            id="intro"
-            rows="2"
-            placeholder="blog intro..."
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            {...register("intro", {
-              required: "Blog content is required",
-              minLength: {
-                value: 10,
-                message: "Content must be at least 10 characters long",
-              },
-            })}
-          ></textarea>
-          {errors.intro && <p className="text-sm text-red-500 mt-2">{errors.intro.message}</p>}
+          <label htmlFor="intro" className="block text-gray-700 font-medium mb-2">Blog Intro</label>
+
+          <ReactQuill
+            theme="snow"
+            value={watch("intro")}
+            onChange={(value) => {
+              setValue("intro", value, { shouldValidate: true });
+              trigger("intro");
+            }}
+            placeholder="Write your blog intro here..."
+            className="bg-white"
+            modules={{
+              toolbar: [
+                [{ header: [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                ['link', 'image'],
+                ['clean'],
+              ]
+            }}
+            formats={[
+              'header', 'bold', 'italic', 'underline', 'strike',
+              'list', 'bullet', 'link', 'image'
+            ]}
+          />
+
+          {errors.intro && (
+            <p className="text-sm text-red-500 mt-2">
+              {errors.intro.message}
+            </p>
+          )}
         </div>
 
 
@@ -195,13 +225,29 @@ function CreateBlog() {
             {/* Para One Description */}
             <div>
               <label htmlFor="paraOneDescription" className="block text-gray-700 font-medium mb-2">Para One Description</label>
-              <textarea
-                id="paraOneDescription"
-                rows="6"
+              <ReactQuill
+                theme="snow"
+                value={watch("paraOneDescription")}
+                onChange={(value) => {
+                  setValue("paraOneDescription", value, { shouldValidate: true });
+                  trigger("paraOneDescription");
+                }}
                 placeholder="Enter para one description"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("paraOneDescription")}
-              ></textarea>
+                className="bg-white"
+                modules={{
+                  toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image'],
+                    ['clean'],
+                  ]
+                }}
+                formats={[
+                  'header', 'bold', 'italic', 'underline', 'strike',
+                  'list', 'bullet', 'link', 'image'
+                ]}
+              />
               {errors.paraOneDescription && <p className="text-sm text-red-500 mt-2">{errors.paraOneDescription.message}</p>}
             </div>
           </div>
@@ -257,13 +303,29 @@ function CreateBlog() {
             {/* Para Two Description */}
             <div>
               <label htmlFor="paraTwoDescription" className="block text-gray-700 font-medium mb-2">Para Two Description</label>
-              <textarea
-                id="paraTwoDescription"
-                rows="6"
+              <ReactQuill
+                theme="snow"
+                value={watch("paraTwoDescription")}
+                onChange={(value) => {
+                  setValue("paraTwoDescription", value, { shouldValidate: true });
+                  trigger("paraTwoDescription");
+                }}
                 placeholder="Enter para two description"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("paraTwoDescription")}
-              ></textarea>
+                className="bg-white"
+                modules={{
+                  toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image'],
+                    ['clean'],
+                  ]
+                }}
+                formats={[
+                  'header', 'bold', 'italic', 'underline', 'strike',
+                  'list', 'bullet', 'link', 'image'
+                ]}
+              />
               {errors.paraTwoDescription && <p className="text-sm text-red-500 mt-2">{errors.paraTwoDescription.message}</p>}
             </div>
           </div>
@@ -320,13 +382,29 @@ function CreateBlog() {
             {/* Para Three Description */}
             <div>
               <label htmlFor="paraThreeDescription" className="block text-gray-700 font-medium mb-2">Para Three Description</label>
-              <textarea
-                id="paraThreeDescription"
-                rows="6"
+              <ReactQuill
+                theme="snow"
+                value={watch("paraThreeDescription")}
+                onChange={(value) => {
+                  setValue("paraThreeDescription", value, { shouldValidate: true });
+                  trigger("paraThreeDescription");
+                }}
                 placeholder="Enter para three description"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("paraThreeDescription")}
-              ></textarea>
+                className="bg-white"
+                modules={{
+                  toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image'],
+                    ['clean'],
+                  ]
+                }}
+                formats={[
+                  'header', 'bold', 'italic', 'underline', 'strike',
+                  'list', 'bullet', 'link', 'image'
+                ]}
+              />
               {errors.paraThreeDescription && <p className="text-sm text-red-500 mt-2">{errors.paraThreeDescription.message}</p>}
             </div>
           </div>
