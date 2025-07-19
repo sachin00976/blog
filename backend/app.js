@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser';
 import { router as userRouter } from './src/routes/user.routes.js';
 import { router as blogRouter } from './src/routes/blog.routes.js';
@@ -8,6 +9,10 @@ import { router as commentRouter } from "./src/routes/comment.routes.js"
 import fileUpload from 'express-fileupload';
 
 const app = express();
+
+dotenv.config({
+    path: './.env'
+})
 
 app.use((req, res, next) => {
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
@@ -32,7 +37,6 @@ const allowedOrigins = [
 // Configure CORS
 app.use(cors({
     origin: function (origin, callback) {
-        console.log("Incoming Origin:", origin);      // for checking which origin causing cors error
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
