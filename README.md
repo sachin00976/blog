@@ -10,7 +10,7 @@
 
 ## 🌐 Live Demo
 
-**[🔗 Click here to visit the live site](blog-orpin-ten.vercel.app)**  
+**[🔗 Click here to visit the live site](https://blog-orpin-ten.vercel.app/)**  
 
 ---
 
