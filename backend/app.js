@@ -34,12 +34,16 @@ const allowedOrigins = [
     process.env.FRONTEND_URI || 'http://localhost:5173'
 ]
 
+console.log("🚀 Allowed Origins:", allowedOrigins);
+
 // Configure CORS
 app.use(cors({
     origin: function (origin, callback) {
+        console.log("🌐 Incoming Origin:", origin); 
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.error("⛔️ Blocked by CORS:", origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
