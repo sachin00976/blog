@@ -54,7 +54,14 @@
 
 ## 📸 Screenshots
 
-> _(Optional: Add real UI screenshots or GIFs of your application here)_
+<img width="1889" height="850" alt="image" src="https://github.com/user-attachments/assets/4179242c-7440-4f86-bcb9-c40be40539f2" />
+
+<img width="1889" height="846" alt="image" src="https://github.com/user-attachments/assets/289272e2-6aa5-440b-a64b-2b6230ee0447" />
+
+<img width="1889" height="858" alt="image" src="https://github.com/user-attachments/assets/4bd590b9-e16a-4f63-a313-8fe67d379221" />
+
+
+
 
 ---
 
@@ -130,9 +137,11 @@ Contributions are what make the open-source community such an amazing place to l
 
 ## 🙋‍♂️ Author
 
-**Prakhar Garg**  
-📧 [prakhargarg1405@gmail.com]  
-🌐 [LinkedIn]([https://www.linkedin.com/in/prakhar-garg-251659282/]) • [GitHub]([https://github.com/Prakhar-Garg7])
+**Prakhar Garg** 
+📧 prakhargarg1405@gmail.com  
+🌐 [LinkedIn](https://www.linkedin.com/in/prakhar-garg-251659282/) • [GitHub](https://github.com/Prakhar-Garg7)
+
+**Sachin Patel**  
 
 ---
 
