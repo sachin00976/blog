@@ -87,8 +87,23 @@ function HeroSection() {
       setBlogData((prevBlogs) => [newBlog, ...(prevBlogs || [])]);
     });
 
+    socket.on('blogUpdated', ({ id, blog }) => {
+      setBlogData((prevBlogs) =>
+        prevBlogs?.map((b) => (b._id === id ? blog : b)) || []
+      );
+    });
+
+    socket.on('blogDeleted', (id) => {
+      setBlogData((prevBlogs) =>
+        prevBlogs?.filter((b) => (b._id !== id)) || []
+      );
+    });
+
+    // cleanups
     return () => {
       socket.off('newBlogCreated');
+      socket.off('blogUpdated');
+      socket.off('blogDeleted');
     };
   }, []);
 

@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ObjectId } from "mongodb";
+import { userSocketMap } from "../socket/index.js";
 
 const blogPost = asyncHandler(async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -110,8 +111,20 @@ const blogPost = asyncHandler(async (req, res) => {
   }
 
   const blog = await Blog.create(blogData);
+  if (!blog) throw new ApiError(500, "Failed to create blog")
 
-  req.io.emit('newBlogCreated', blog);
+  const blogObj = blog.toObject(); 
+
+  blogObj.authorAvatar = { url: authorAvatar };
+  blogObj.authorName = authorName;
+
+  req.io.emit('newBlogCreated', blogObj);
+
+  const socketId = userSocketMap.get(req.user._id?.toString())
+
+  if (socketId) {
+    req.io.to(socketId).emit("myNewBlogCreated", blogObj);
+  }
 
   return res.status(201).json(
     new ApiResponse(201, blog, "Blog Uploaded Successfully!")
@@ -133,10 +146,20 @@ const deleteBlog = asyncHandler(async (req, res) => {
 
   const delRes = await blog.deleteOne()
 
+  if (!delRes) throw new ApiError(500, "Failed to delete blog")
+
+  req.io.emit("blogDeleted", id)
+  const socketId = userSocketMap.get(req.user._id?.toString())
+
+  if (socketId) {
+    req.io.to(socketId).emit("myOwnBlogDeleted", id);
+  }
+
   return res.status(200).json(
     new ApiResponse(200, delRes, "blog deleted successfully")
   )
 })
+
 const getAllBlogs = asyncHandler(async (req, res) => {
   const { tag = "All" } = req.query;
   let filteredTag = tag === "All" ? "" : tag;
@@ -244,6 +267,9 @@ const updateBlog = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Invalid id")
   }
 
+  const authorName = req.user.name;
+  const authorAvatar = req.user.avatar.url;
+
   let blog = await Blog.findById(id)
   //console.log("req:",req.files)
 
@@ -329,6 +355,24 @@ const updateBlog = asyncHandler(async (req, res) => {
     runValidators: true,
     useFindAndModify: false,
   })
+
+  if (!blog) throw new ApiError(500, "Failed to update blog")
+
+  const blogObj = blog.toObject(); 
+
+  blogObj.authorAvatar = { url: authorAvatar };
+  blogObj.authorName = authorName;
+
+  console.log("BlogObj in backend: ", JSON.stringify(blogObj, null, 2))
+
+  req.io.emit('blogUpdated', { id, blog });
+  
+  const socketId = userSocketMap.get(req.user._id?.toString())
+
+  if (socketId) {
+    req.io.to(socketId).emit("myBlogUpdated", {id, blogObj});
+  }
+
   return res.status(200).json(
     new ApiResponse(200, blog, "Blog updated successfully")
   )

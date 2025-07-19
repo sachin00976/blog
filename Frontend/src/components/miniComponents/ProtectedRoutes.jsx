@@ -5,9 +5,6 @@ import Loader from "../../utility/Loader"
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useContext(Context);
-  useEffect(() => {
-    console.log("ProtectedRoute - loading:", loading, "isAuthenticated:", isAuthenticated);
-  }, [loading, isAuthenticated]);
 
   if (loading || !isAuthenticated) return <Loader />;
 
