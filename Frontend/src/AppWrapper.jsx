@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom'
 import axios from "./utility/AxiosInstance";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Loader from "./utility/Loader";
+import { HelmetProvider } from 'react-helmet-async';
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -38,24 +39,26 @@ const AppWrapper = () => {
     checkAuth();
   }, []);
 
-  if(loading) return <Loader/>
+  if (loading) return <Loader />
 
   return (
-    <GoogleOAuthProvider clientId={clientId}>
-      <Context.Provider
-        value={{
-          user,
-          setUser,
-          isAuthenticated,
-          setIsAuthenticated,
-          blogs,
-          setBlogs,
-          loading
-        }}
-      >
-        <RouterProvider router={Router} />
-      </Context.Provider>
-    </GoogleOAuthProvider>
+    <HelmetProvider>
+      <GoogleOAuthProvider clientId={clientId}>
+        <Context.Provider
+          value={{
+            user,
+            setUser,
+            isAuthenticated,
+            setIsAuthenticated,
+            blogs,
+            setBlogs,
+            loading
+          }}
+        >
+          <RouterProvider router={Router} />
+        </Context.Provider>
+      </GoogleOAuthProvider>
+    </HelmetProvider>
   )
 }
 export { Context, AppWrapper }

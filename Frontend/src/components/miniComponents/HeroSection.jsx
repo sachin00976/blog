@@ -27,16 +27,8 @@ function HeroSection() {
   });
 
   const tags = [
-    "All", "Travel", "Anime", "Testing", "Lifestyle", "Education", "Tech",
-    "Gaming", "Health", "Food", "Finance", "Business", "Art",
-    "Music", "Photography", "Science", "Sports", "Movies", "Books",
-    "History", "Philosophy", "Programming", "AI", "Machine Learning",
-    "Cybersecurity", "Space", "DIY", "Pets", "Fashion", "Fitness",
-    "Motivation", "Relationships", "Parenting", "News", "Culture",
-    "Spirituality", "Psychology", "Nature", "Environment", "Politics",
-    "Economics", "Career", "Self-Improvement", "Mindfulness", "Startups",
-    "Blockchain", "Cryptocurrency", "Investing", "Marketing", "Social Media",
-    "Photography", "Design"
+    "Technology", "Health", "Travel", "Food", "Lifestyle", "Finance", "Finance",
+    "Finance", "Education", "Entertainment", "Game", "Anime", "Testing"
   ];
 
   const visibleTags = 6;

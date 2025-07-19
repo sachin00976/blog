@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import Comments from '../miniComponents/comments'
 import axios from '../../utility/AxiosInstance'
 import DOMPurify from "dompurify";
+import { Helmet } from 'react-helmet-async'
 
 function SingleBlog() {
   const { id } = useParams();
@@ -47,6 +48,9 @@ function SingleBlog() {
 
   return (
     <>
+      <Helmet>
+        <title>{`Blog - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <article>
         {data && (
           <section className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 mx-auto px-6 md:px-12 lg:px-20 py-12 space-y-12 shadow-lg">

@@ -5,6 +5,7 @@ import Loader from "../../utility/Loader";
 import { Link } from "react-router-dom";
 import { FaAngleDoubleDown, FaAngleDoubleUp } from "react-icons/fa";
 import axios from "../../utility/AxiosInstance";
+import { Helmet } from 'react-helmet-async'
 
 function FollowedBlogs() {
   const [blogData, setBlogData] = useState(null);
@@ -43,6 +44,9 @@ function FollowedBlogs() {
 
   return (
     <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 p-6">
+      <Helmet>
+        <title>{`Followed blogs - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       {/* Title */}
       <h1 className="text-white text-3xl font-bold text-center mb-6">BLOGS</h1>
 

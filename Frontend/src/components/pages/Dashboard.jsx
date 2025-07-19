@@ -6,6 +6,7 @@ import ErrorComp from '../../utility/ErrorPage'
 import { Link } from 'react-router-dom'
 import socket from "../../socket/index"
 import axios from "../../../src/utility/AxiosInstance"
+import { Helmet } from 'react-helmet-async'
 
 function Dashboard() {
   const { user } = useContext(Context)
@@ -69,6 +70,9 @@ function Dashboard() {
   }
   return (
     <>
+      <Helmet>
+        <title>{`Dashboard - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white py-10 px-12 shadow-lg">
         {/* Heading */}
         <h2 className="text-center text-5xl font-extrabold tracking-wide mb-10">User Profile</h2>
