@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { GoogleLoginComponent } from '../miniComponents/index.js'
 import axios from '../../utility/AxiosInstance.jsx';
 import { Helmet } from 'react-helmet-async'
+import LoaderOverlay from '../../utility/LoaderOverlay';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -15,10 +16,12 @@ function Login() {
   const navigate = useNavigate();
 
   const [generalError, setGeneralError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const login = async (formData) => {
 
     try {
+      setLoading(true)
       const config = {
         method: "post",
         url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/login`,
@@ -37,6 +40,8 @@ function Login() {
     } catch (err) {
 
       setGeneralError(err.response?.data?.message || err.message || "Unexpected error occurred while login the user");
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -45,6 +50,7 @@ function Login() {
       <Helmet>
         <title>{`Login - ${import.meta.env.VITE_APP_NAME}`}</title>
       </Helmet>
+      {loading && <LoaderOverlay />}
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Sign In</h1>
 

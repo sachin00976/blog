@@ -9,11 +9,13 @@ import toast from 'react-hot-toast';
 import { GoogleLoginComponent } from '../miniComponents/index.js'
 import axios from '../../utility/AxiosInstance.jsx';
 import { Helmet } from 'react-helmet-async';
+import LoaderOverlay from '../../utility/LoaderOverlay';
 
 function Register() {
   const { setUser, setIsAuthenticated } = useContext(Context);
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const [generalError, setGeneralError] = useState("");
+  const [loading, setLoading] = useState(false);
   const selectedFile = watch("avatar");
   const imagePreview = selectedFile && selectedFile[0] ? URL.createObjectURL(selectedFile[0]) : null;
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ function Register() {
 
   const reg = async (formData) => {
     try {
+      setLoading(true)
       setGeneralError(null);
       const config = {
         url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/register`,
@@ -51,6 +54,8 @@ function Register() {
     } catch (error) {
       console.error(error);
       setGeneralError(error.response?.data?.message || error.message || "Unexpected error occurred while registering the user");
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -59,6 +64,7 @@ function Register() {
       <Helmet>
         <title>{`Register - ${import.meta.env.VITE_APP_NAME}`}</title>
       </Helmet>
+      {loading && <LoaderOverlay />}
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Register</h1>
 
