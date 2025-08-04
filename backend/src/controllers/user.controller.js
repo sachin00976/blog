@@ -103,6 +103,18 @@ const login = asyncHandler(async (req, res) => {
 
   const userId = user._id;
 
+
+  // Validate password
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if (!isPasswordValid) {
+    throw new ApiError(400, "Invalid password. Please try again.");
+  }
+
+   // Validate role
+  if (user.role !== role) {
+    throw new ApiError(400, "Invalid role. Please enter the correct role!");
+  }
+
   // Fetch subscriber count for the user
   const response = await Subscriber.aggregate([
     { $match: { authorId: userId } },
@@ -119,23 +131,10 @@ const login = asyncHandler(async (req, res) => {
   // Prepare user object with subscription count
   const userWithSubscriptionCount = { subscriberCount, ...user._doc };
 
-  // Validate password
-  const isPasswordValid = await user.isPasswordCorrect(password);
-  if (!isPasswordValid) {
-    throw new ApiError(400, "Invalid password. Please try again.");
-  }
-
-  // Validate role
-  if (user.role !== role) {
-    throw new ApiError(400, "Invalid role. Please enter the correct role!");
-  }
 
   // Generate access and refresh tokens
   const { refreshToken, accessToken } = await genrateAccessTokenAndRefreshToken(user._id);
 
-  console.log("In backend \n");
-  console.log("accessToken:", accessToken)
-  console.log("refreshToken:", refreshToken)
 
   // Set cookies and respond with success
   return res
@@ -314,7 +313,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   let subscribed = false
   let subscriberCount = 0
   subscribed = SubResponse[0]?.subscribed
-  subscriberCount = SubResponse[0]?.SubscriberCount
+  subscriberCount = SubResponse[0]?.SubscriberCount || 0
   const allBlogsResponse = await User.aggregate([
     {
       $match: {

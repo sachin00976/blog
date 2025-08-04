@@ -43,7 +43,7 @@ function EditProfile() {
       formData.append('phone', data.phone || '');
       formData.append('education', data.education || '');
       if (data.avatar && data.avatar.length > 0) {
-        formData.append('avatar', data.avatar[0]); // Send file directly
+        formData.append('avatar', data.avatar[0]); 
       }
 
       const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/updateUserProfile`, formData, {
@@ -53,7 +53,7 @@ function EditProfile() {
       });
 
       if (response.data) {
-        console.log("update User Profile:",response)
+        
         setUser(response.data.data);
         toast.success(response.data.message)
         navigate('/dashboard');

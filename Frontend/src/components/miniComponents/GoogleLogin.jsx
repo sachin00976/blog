@@ -14,6 +14,7 @@ const GoogleLoginComponent = () => {
   useEffect(() => {
     const sendCredential = async () => {
       try {
+        
         if (credential) {
           const config = {
             method: "post", 

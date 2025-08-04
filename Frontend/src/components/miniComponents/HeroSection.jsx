@@ -82,7 +82,7 @@ function HeroSection() {
 
   useEffect(() => {
     fetchBestAuthors();
-    if (data) {
+    if (data) {  // data refer to blog data 
       setBlogData(data);
     }
   }, [data]);

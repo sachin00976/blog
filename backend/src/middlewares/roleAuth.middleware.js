@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 const roleAuth = (...roles) => {
    
     return (req, res, next) => {
-        console.log(roles,req.user.role)
+        
       if (!roles.includes(req.user.role)) {
         
         return next(

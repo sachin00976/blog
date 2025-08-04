@@ -5,8 +5,8 @@ import { Toaster } from 'react-hot-toast'
 import { useEffect, useContext } from 'react'
 import { Context } from './AppWrapper'
 function App() {
-  const navigate = useNavigate()
-  const { setUser, setIsAuthenticated, setBlogs } = useContext(Context)
+  // const navigate = useNavigate()
+  // const { setUser, setIsAuthenticated, setBlogs } = useContext(Context)
   return (
     <>
       <Navbar />

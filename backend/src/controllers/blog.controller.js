@@ -9,7 +9,7 @@ const blogPost = asyncHandler(async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     throw new ApiError(404, "Blog Main Image File Is Missing!");
   }
-  console.log(req.files)
+ 
   const mainImage = req.files['mainImage[]'];
   const paraOneImage = req.files['paraOneImage[]'];
   const paraTwoImage = req.files['paraTwoImage[]'];
@@ -117,24 +117,40 @@ const blogPost = asyncHandler(async (req, res) => {
   );
 });
 const deleteBlog = asyncHandler(async (req, res) => {
-  // console.log("delete bolg called")
-  const { id } = req.params
-  if (!id) {
-    throw new ApiError(404, "Inavlid Request To Delete A Blog Without ID")
+  const { id } = req.params;
+
+  if (!id || !ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid Request: Missing or invalid blog ID");
   }
 
-  const blog = await Blog.findById(id)
-
+  const blog = await Blog.findById(id);
   if (!blog) {
-    throw new ApiError(404, "Blog Not Found!")
+    throw new ApiError(404, "Blog Not Found!");
   }
 
-  const delRes = await blog.deleteOne()
+
+  await deleteOnCloudinary(blog.mainImage.public_id);
+
+  if (blog.paraOneImage) {
+    await deleteOnCloudinary(blog.paraOneImage.public_id);
+  }
+
+  if (blog.paraTwoImage) {
+    await deleteOnCloudinary(blog.paraTwoImage.public_id);
+  }
+
+  if (blog.paraThreeImage) {
+    await deleteOnCloudinary(blog.paraThreeImage.public_id);
+  }
+
+  
+  await blog.deleteOne();
 
   return res.status(200).json(
-    new ApiResponse(200, delRes, "blog deleted successfully")
-  )
-})
+    new ApiResponse(200, blog, "Blog deleted successfully")
+  );
+});
+
 const getAllBlogs = asyncHandler(async (req, res) => {
   const { tag="All" } = req.query;
   let filteredTag = tag === "All" ? "" : tag;
@@ -243,7 +259,7 @@ const updateBlog = asyncHandler(async (req, res) => {
   }
 
   let blog = await Blog.findById(id)
-  //console.log("req:",req.files)
+  
 
   const newBlogData = {
     title: req.body.title,
@@ -264,10 +280,7 @@ const updateBlog = asyncHandler(async (req, res) => {
     const paraTwoImage = req.files['paraTwoImage[]'];
     const paraThreeImage = req.files['paraThreeImage[]'];
 
-    // if(!mainImage)
-    // {
-    //   throw new ApiError(404,"mainimage file is required!")
-    // }
+    
 
     const allowedFormat = ["image/png", "image/jpeg", "image/webp"]
     if (
@@ -287,7 +300,7 @@ const updateBlog = asyncHandler(async (req, res) => {
     const paraThreeImage = req.files['paraThreeImage[]'];
     if (mainImage) {
       const mainImageId = blog.mainImage.public_id
-      deleteOnCloudinary(mainImageId)
+      await deleteOnCloudinary(mainImageId)
       const newMainImage = await uploadOnCloudinary(mainImage.tempFilePath)
       newBlogData.mainImage = {
         public_id: newMainImage.public_id,
@@ -296,7 +309,7 @@ const updateBlog = asyncHandler(async (req, res) => {
     }
     if (paraOneImage) {
       const paraOneImageId = blog.paraOneImage.public_id
-      deleteOnCloudinary(paraOneImageId)
+      await deleteOnCloudinary(paraOneImageId)
       const newParaOneImage = await uploadOnCloudinary(paraOneImage.tempFilePath)
       newBlogData.paraOneImage = {
         public_id: newParaOneImage.public_id,
@@ -305,7 +318,7 @@ const updateBlog = asyncHandler(async (req, res) => {
     }
     if (paraTwoImage) {
       const paraTwoImageId = blog.paraTwoImage.public_id
-      deleteOnCloudinary(paraTwoImageId)
+      await deleteOnCloudinary(paraTwoImageId)
       const newParaTwoImage = await uploadOnCloudinary(paraTwoImage.tempFilePath)
       newBlogData.paraTwoImage = {
         public_id: newParaTwoImage.public_id,
@@ -314,7 +327,7 @@ const updateBlog = asyncHandler(async (req, res) => {
     }
     if (paraThreeImage) {
       const paraThreeImageId = blog.paraThreeImage.public_id
-      deleteOnCloudinary(paraThreeImageId)
+      await deleteOnCloudinary(paraThreeImageId)
       const newParaThreeImage = await uploadOnCloudinary(paraThreeImage.tempFilePath)
       newBlogData.paraThreeImage = {
         public_id: newParaThreeImage.public_id,

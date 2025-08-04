@@ -64,8 +64,7 @@ const getAllUserSubscriberInfo = asyncHandler(async (req, res) => {
   if (!ObjectId.isValid(userId)) {
     throw new ApiError(400, "Invalid User Id");
   }
-  console.log("page:",page)
-  console.log("skip:",skip)
+
 
   const totalCountResponse = await Subscriber.aggregate([
     {

@@ -18,7 +18,7 @@ function Followings() {
       setLoading(true);
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/subscribe/allSubscribedAuhtorInfo?page=${pageNo}&limit=${limit}`);
       setData(response.data.data.allAuthorInfo);
-      console.log("allAuth",response.data.data)
+      //console.log("allAuth",response.data.data)
       setTotalPages(Math.ceil(response.data.data.total / limit));
     } catch (err) {
       setError(err.message);
@@ -47,7 +47,11 @@ function Followings() {
         <label className="text-white mr-2">Items per page:</label>
         <select
           value={limit}
-          onChange={(e) => setLimit(Number(e.target.value))}
+          onChange={(e) => {
+            setLimit(Number(e.target.value))
+            setPageNo(0)
+
+          }}
           className="bg-gray-300 px-3 py-1 rounded"
         >
           <option value={4}>4</option>

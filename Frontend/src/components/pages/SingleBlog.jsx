@@ -86,6 +86,7 @@ function SingleBlog() {
                 src={data.authorAvatar}
                 alt="author_avatar"
                 className="w-20 h-20 rounded-full shadow-xl border-4 border-[#38235d]"
+                onClick={()=>navigate(`/userProfile/${data.createdBy}`)}
               />
               <p className="text-xl md:text-2xl text-white font-bold font-serif">
                 {data.authorName}

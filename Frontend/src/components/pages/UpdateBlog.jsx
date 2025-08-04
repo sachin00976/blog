@@ -65,7 +65,7 @@ function UpdateBlog() {
   const selectedParaTwoImage = watch("paraTwoImage");
   const selectedParaThreeImage = watch("paraThreeImage");
   
-  console.log("selescted_main:",selectedMainImage)
+  
   
 // Generate previews for all images based on the given logic
 const mainImagePreview =
@@ -96,7 +96,7 @@ const paraThreeImagePreview =
     ? URL.createObjectURL(selectedParaThreeImage[0])
     : null;
 
-// Cleanup logic to prevent memory leaks
+
 useEffect(() => {
   // Array of previews
   const previews = [
@@ -110,7 +110,7 @@ useEffect(() => {
   return () => {
     previews.forEach((preview) => {
       if (preview && typeof preview !== "string") {
-        URL.revokeObjectURL(preview); // Revoke object URLs
+        URL.revokeObjectURL(preview); 
       }
     });
   };
@@ -120,7 +120,7 @@ useEffect(() => {
 
   const createBlogHandler = async (formData) => {
     
-    console.log("from data:",formData)
+    
     try {
       setGeneralError(null);
       const config={

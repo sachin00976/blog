@@ -7,9 +7,7 @@ import axios from '../../utility/AxiosInstance';
 
 function CreateBlog() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
-    defaultValues: {
-      paraOneImage: []
-    }
+    
   });
   const [generalError, setGeneralError] = useState("");
   const selectedMainImage = watch("mainImage");
@@ -24,16 +22,27 @@ function CreateBlog() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    
+    const previews = [
+      mainImagePreview,
+      paraOneImagePreview,
+      paraTwoImagePreview,
+      paraThreeImagePreview,
+    ];
+  
+    // Cleanup function
     return () => {
-      if (mainImagePreview) {
-        URL.revokeObjectURL(mainImagePreview);
-      }
+      previews.forEach((preview) => {
+        if (preview ) {
+          URL.revokeObjectURL(preview); 
+        }
+      });
     };
-  }, [mainImagePreview]);
+  }, [mainImagePreview, paraOneImagePreview, paraTwoImagePreview, paraThreeImagePreview]);
 
   const createBlogHandler = async (formData) => {
 
-    console.log("from data:", formData)
+    
     try {
       setGeneralError(null);
       const config = {
@@ -55,6 +64,9 @@ function CreateBlog() {
       console.error(error);
       setGeneralError(error.response?.data?.message || error.message || "Unexpected error occurred while creating the blog");
     }
+    
+
+    
   };
 
   return (

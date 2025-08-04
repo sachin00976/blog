@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 
 // Helper function to fetch all comments of a blog
 const getAllComments = async (blogId) => {
-  console.log("hello1")
+  
   if (!ObjectId.isValid(blogId)) {
     throw new ApiError(400, "Invalid Blog ID");
   }
@@ -77,7 +77,7 @@ const editComment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
 
-  console.log("commentId: ", commentId, "blogId: ", blogId, "newComment: ", newComment, "userId: ", userId);
+  
 
   if (!ObjectId.isValid(commentId)) {
     throw new ApiError(400, "Invalid Comment ID");

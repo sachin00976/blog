@@ -144,14 +144,14 @@ const Comments = () => {
                             <div className="flex-1 overflow-y-auto space-y-4">
                                 {comments && comments.length > 0 ? (
                                     comments.map((comment, index) => (
-                                        <div key={index} className="flex items-start space-x-3 border-b pb-3">
+                                        <div key={comment._id} className="flex items-start space-x-3 border-b pb-3">
                                             <img src={comment.authorInfo.avatar.url} alt={comment.authorInfo.name} className="w-10 h-10 rounded-full" />
                                             <div>
                                                 <h3 className="text-sm font-semibold text-gray-800">{comment.authorInfo.name}</h3>
                                                 <p className="text-sm text-gray-600">{comment.comment}</p>
 
                                                 {/* Move the condition inside the wrapping div */}
-                                                {comment.authorInfo.name === user.name && (
+                                                {comment.authorInfo._id === user._id && (
                                                     <div className="mt-2 flex space-x-2">
                                                         {(isEditCommentBoxVisible && comment._id === editCommentId) ? (
                                                             <div className="mt-2 space-y-2">
