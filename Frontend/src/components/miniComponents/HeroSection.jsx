@@ -11,6 +11,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import axios from "../../utility/AxiosInstance";
+import socket from "../../../src/socket/index"
 
 function HeroSection() {
   const navigate = useNavigate();
@@ -26,16 +27,8 @@ function HeroSection() {
   });
 
   const tags = [
-    "All", "Travel", "Anime", "Lifestyle", "Education", "Tech",
-    "Gaming", "Health", "Food", "Finance", "Business", "Art",
-    "Music", "Photography", "Science", "Sports", "Movies", "Books",
-    "History", "Philosophy", "Programming", "AI", "Machine Learning",
-    "Cybersecurity", "Space", "DIY", "Pets", "Fashion", "Fitness",
-    "Motivation", "Relationships", "Parenting", "News", "Culture",
-    "Spirituality", "Psychology", "Nature", "Environment", "Politics",
-    "Economics", "Career", "Self-Improvement", "Mindfulness", "Startups",
-    "Blockchain", "Cryptocurrency", "Investing", "Marketing", "Social Media",
-    "Photography", "Design"
+    "Technology", "Health", "Travel", "Food", "Lifestyle", "Finance", "Finance",
+    "Finance", "Education", "Entertainment", "Game", "Anime", "Testing"
   ];
 
   const visibleTags = 6;
@@ -79,6 +72,32 @@ function HeroSection() {
       setLoader(false);
     }
   };
+
+  // socket events
+  useEffect(() => {
+    socket.on('newBlogCreated', (newBlog) => {
+      setBlogData((prevBlogs) => [newBlog, ...(prevBlogs || [])]);
+    });
+
+    socket.on('blogUpdated', ({ id, blog }) => {
+      setBlogData((prevBlogs) =>
+        prevBlogs?.map((b) => (b._id === id ? blog : b)) || []
+      );
+    });
+
+    socket.on('blogDeleted', (id) => {
+      setBlogData((prevBlogs) =>
+        prevBlogs?.filter((b) => (b._id !== id)) || []
+      );
+    });
+
+    // cleanups
+    return () => {
+      socket.off('newBlogCreated');
+      socket.off('blogUpdated');
+      socket.off('blogDeleted');
+    };
+  }, []);
 
   useEffect(() => {
     fetchBestAuthors();
@@ -131,7 +150,7 @@ function HeroSection() {
                       <p className="mt-2 text-white font-semibold">
                         Subscribers: {author.subCount}
                       </p>
-                      
+
                     </div>
                   </SwiperSlide>
                 ))}

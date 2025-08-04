@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Comments from '../miniComponents/comments'
 import axios from '../../utility/AxiosInstance'
-
+import DOMPurify from "dompurify";
+import { Helmet } from 'react-helmet-async'
 
 function SingleBlog() {
   const { id } = useParams();
@@ -47,6 +48,9 @@ function SingleBlog() {
 
   return (
     <>
+      <Helmet>
+        <title>{`Blog - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <article>
         {data && (
           <section className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 mx-auto px-6 md:px-12 lg:px-20 py-12 space-y-12 shadow-lg">
@@ -105,9 +109,7 @@ function SingleBlog() {
             )}
 
             {/* Introduction */}
-            <p className="text-lg md:text-2xl leading-relaxed text-white font-medium font-serif text-center">
-              {data.intro}
-            </p>
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.intro) }} className="text-lg md:text-2xl leading-relaxed text-white font-medium font-serif text-center" />
 
             {/* Section 1 */}
             <div className="space-y-6">
@@ -123,9 +125,7 @@ function SingleBlog() {
                   />
                 </div>
               )}
-              <p className="text-xl md:text-2xl text-white font-medium font-serif">
-                {data.paraOneDescription}
-              </p>
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.paraOneDescription) }} className="text-xl md:text-2xl text-white font-medium font-serif" />
             </div>
 
             {/* Section 2 */}
@@ -142,9 +142,7 @@ function SingleBlog() {
                   />
                 </div>
               )}
-              <p className="text-xl md:text-2xl text-white font-medium font-serif">
-                {data.paraTwoDescription}
-              </p>
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.paraTwoDescription) }} className="text-xl md:text-2xl text-white font-medium font-serif" />
             </div>
 
             {/* Section 3 */}
@@ -161,9 +159,7 @@ function SingleBlog() {
                   />
                 </div>
               )}
-              <p className="text-xl md:text-2xl text-white font-medium font-serif">
-                {data.paraThreeDescription}
-              </p>
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.paraThreeDescription) }} className="text-xl md:text-2xl text-white font-medium font-serif" />
             </div>
           </section>
         )}

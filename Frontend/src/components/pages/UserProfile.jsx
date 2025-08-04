@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import Loader from '../../utility/Loader';
 import toast from 'react-hot-toast';
 import axios from '../../utility/AxiosInstance';
+import { Helmet } from 'react-helmet-async'
 
 function UserProfile() {
   const { user } = useContext(Context);
@@ -62,6 +63,9 @@ function UserProfile() {
 
   return (
     <>
+      <Helmet>
+        <title>{`Profile - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       {data ? (
         <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white py-10 px-12 rounded-lg shadow-lg">
           <h2 className="text-center text-5xl font-extrabold tracking-wide mb-10">

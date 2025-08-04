@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaCamera } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import axios from '../../utility/AxiosInstance';
+import { Helmet } from 'react-helmet-async'
 
 function EditProfile() {
   const { user, setUser } = useContext(Context);
@@ -66,6 +67,9 @@ function EditProfile() {
 
   return (
     <div className="bg-[#2f0c5f] min-h-screen flex items-center justify-center px-4">
+      <Helmet>
+        <title>{`Edit profile - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <div className="bg-white text-black p-8 rounded-2xl shadow-2xl w-full max-w-lg">
         <h2 className="text-center text-4xl font-bold mb-6 text-gray-800">Edit Profile</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

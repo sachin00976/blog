@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ErrorComp from '../../utility/ErrorPage';
 import Loader from '../../utility/Loader';
 import axios from '../../utility/AxiosInstance';
+import { Helmet } from 'react-helmet-async'
 
 function Followings() {
   const navigate = useNavigate();
@@ -42,6 +43,9 @@ function Followings() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
+      <Helmet>
+        <title>{`Followings - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <h1 className="text-4xl font-bold text-center text-white mb-8">Your Followings</h1>
       <div className="flex justify-end mb-4">
         <label className="text-white mr-2">Items per page:</label>

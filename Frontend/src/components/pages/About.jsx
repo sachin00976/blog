@@ -1,8 +1,12 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async'
 
 function About() {
   return (
     <>
+      <Helmet>
+        <title>{`About - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white min-h-screen flex flex-col items-center py-10">
         {/* About Us Section */}
         <div className="max-w-4xl text-center mb-12">

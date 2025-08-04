@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser';
 import { router as userRouter } from './src/routes/user.routes.js';
 import { router as blogRouter } from './src/routes/blog.routes.js';
@@ -9,9 +10,23 @@ import fileUpload from 'express-fileupload';
 
 const app = express();
 
+dotenv.config({
+    path: './.env'
+})
+
 app.use((req, res, next) => {
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
     res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+    next();
+});
+
+let io = null;
+export const setIO = (ioInstance) => {
+    io = ioInstance;
+};
+
+app.use((req, res, next) => {
+    if (io) req.io = io;
     next();
 });
 
@@ -19,16 +34,20 @@ const allowedOrigins = [
     process.env.FRONTEND_URI || 'http://localhost:5173'
 ]
 
+console.log("🚀 Allowed Origins:", allowedOrigins);
+
 // Configure CORS
 app.use(cors({
     origin: function (origin, callback) {
+        console.log("🌐 Incoming Origin:", origin); 
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.error("⛔️ Blocked by CORS:", origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true 
+    credentials: true
 }));
 
 

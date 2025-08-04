@@ -1,16 +1,66 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Context } from '../../AppWrapper'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useApiHandler from '../../utility/ApiHandler'
 import ErrorComp from '../../utility/ErrorPage'
 import { Link } from 'react-router-dom'
+import socket from "../../socket/index"
+import axios from "../../../src/utility/AxiosInstance"
+import { Helmet } from 'react-helmet-async'
+
 function Dashboard() {
   const { user } = useContext(Context)
   const navigate = useNavigate()
-  const { res, data, error, loader } = useApiHandler({
-    url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/allUserBlog`
-  })
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [blogData, setBlogData] = useState("")
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/allUserBlog`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true
+        });
+        setBlogData(response.data.data.blogs);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    socket.on('myOwnBlogDeleted', (id) => {
+      setBlogData((prevBlogs) =>
+        prevBlogs?.filter((b) => b._id !== id) || []
+      );
+    });
+
+    socket.on('myNewBlogCreated', (newBlog) => {
+      setBlogData((prevBlogs) => ([newBlog, ...prevBlogs]));
+    });
+
+    socket.on('myBlogUpdated', ({ id, blog }) => {
+      console.log("new blog in frontend: ", JSON.stringify(blog, null, 2))
+      setBlogData((prevBlogs) =>
+        prevBlogs?.map((b) => (b._id === id ? blog : b)) || []
+      );
+    });
+
+    // cleanups
+    return () => {
+      socket.off('myOwnBlogDeleted');
+      socket.off('myNewBlogCreated');
+      socket.off('myBlogUpdated');
+    };
+  }, []);
+
   if (error) {
     return (
       <>
@@ -20,6 +70,9 @@ function Dashboard() {
   }
   return (
     <>
+      <Helmet>
+        <title>{`Dashboard - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <div className="bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 text-white py-10 px-12 shadow-lg">
         {/* Heading */}
         <h2 className="text-center text-5xl font-extrabold tracking-wide mb-10">User Profile</h2>
@@ -81,13 +134,13 @@ function Dashboard() {
         {/* User Blogs */}
         <div className="mt-16">
           <h2 className="text-3xl font-semibold mb-4">Blogs</h2>
-          {loader ? (
+          {loading ? (
             <h2 className='text-3xl font-semibold mb-4'>Loading...</h2>
           ) :
             (
 
               <div className='flex flex-wrap gap-10 bg-gradient-to-r from-purple-800 via-purple-900 to-gray-900 '>
-                {data && data !== null && data.blogs?.length !== 0 && data.blogs.map((blog) => (
+                {blogData && blogData.length !== 0 && blogData.map((blog) => (
 
                   <Link
                     to={`/blog/${blog._id}`}

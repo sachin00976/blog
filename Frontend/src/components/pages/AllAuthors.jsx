@@ -4,6 +4,7 @@ import ErrorComp from "../../utility/ErrorPage";
 import Loader from "../../utility/Loader";
 import { LuSearch } from 'react-icons/lu';
 import axios from "../../utility/AxiosInstance";
+import { Helmet } from 'react-helmet-async'
 
 function AllAuthors() {
   const navigate = useNavigate();
@@ -43,6 +44,9 @@ function AllAuthors() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-800 via-purple-900 to-gray-900 py-10 px-5">
+      <Helmet>
+        <title>{`All authors - ${import.meta.env.VITE_APP_NAME}`}</title>
+      </Helmet>
       <div className="max-w-7xl mx-auto bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-lg">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 sm:mb-0">Meet Our Authors</h1>

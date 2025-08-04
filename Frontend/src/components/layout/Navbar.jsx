@@ -1,19 +1,21 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { GiCurlyWing } from "react-icons/gi";
 import { Menu } from "lucide-react";
 import { Context } from "../../AppWrapper";
 import toast from "react-hot-toast";
-import axios from "../../utility/AxiosInstance";
+import LoaderOverlay from "../../utility/LoaderOverlay";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "../ui/sheet"
+import axios from "../../utility/AxiosInstance";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false)
   const isDashboard = location.pathname.startsWith("/dashboard")
   const isHome = location.pathname === '/'
   const isAllAuthors = location.pathname.startsWith("/authors")
@@ -25,6 +27,7 @@ const Navbar = () => {
 
   const logoutHandler = async () => {
     try {
+      setLoading(true)
       const config = {
         url: `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/logout`,
         method: "get",
@@ -39,6 +42,8 @@ const Navbar = () => {
     } catch (error) {
       console.log(error);
       toast.error(error?.response?.message || error.message || "Unexpected error during logout");
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -56,6 +61,7 @@ const Navbar = () => {
 
   return (
     <header className="w-full bg-[#41098E] text-white shadow-md px-4 py-2">
+      {loading && <LoaderOverlay />}
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         
         {/* Left Section: Logo + Brand */}
@@ -102,7 +108,7 @@ const Navbar = () => {
             <SheetTrigger className="text-white">
               <Menu size={28} />
             </SheetTrigger>
-            <SheetContent side="left" className="bg-[#41098E] text-white">
+            <SheetContent side="left" className="bg-[#41098E] text-white w-48">
               <div className="mt-8 flex flex-col gap-6 text-xl font-semibold">
                 {navLinks}
                 <div className="mt-4">
